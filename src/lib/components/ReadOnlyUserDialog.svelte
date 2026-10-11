@@ -183,13 +183,13 @@
 			<div class="grid gap-3 {mysql ? 'grid-cols-[1fr_10rem]' : ''}">
 				<div>
 					<label class="label" for="ro-name">{mysql ? 'User name' : 'Role name'}</label>
-					<input id="ro-name" class="input font-mono text-[13px]" bind:value={name} autocomplete="off" spellcheck="false" />
-					{#if preview?.exists}<p class="mt-1 text-[11px] text-warning">{mysql ? 'That account' : 'A role with that name'} already exists — CREATE will fail. Pick another name.</p>{/if}
+					<input id="ro-name" class="input font-mono text-[0.8125rem]" bind:value={name} autocomplete="off" spellcheck="false" />
+					{#if preview?.exists}<p class="mt-1 text-[0.6875rem] text-warning">{mysql ? 'That account' : 'A role with that name'} already exists — CREATE will fail. Pick another name.</p>{/if}
 				</div>
 				{#if mysql}
 					<div>
 						<label class="label" for="ro-host">Host pattern</label>
-						<input id="ro-host" class="input font-mono text-[13px]" bind:value={host} placeholder="%" title="% allows any host; 10.0.0.% a subnet; a single address or name pins it" />
+						<input id="ro-host" class="input font-mono text-[0.8125rem]" bind:value={host} placeholder="%" title="% allows any host; 10.0.0.% a subnet; a single address or name pins it" />
 					</div>
 				{/if}
 			</div>
@@ -197,14 +197,14 @@
 			<div>
 				<label class="label" for="ro-pass">Password</label>
 				<div class="flex gap-2">
-					<input id="ro-pass" class="input font-mono text-[13px]" type={showPassword ? 'text' : 'password'} bind:value={password} autocomplete="new-password" spellcheck="false" />
+					<input id="ro-pass" class="input font-mono text-[0.8125rem]" type={showPassword ? 'text' : 'password'} bind:value={password} autocomplete="new-password" spellcheck="false" />
 					<button class="btn btn-secondary btn-icon" title={showPassword ? 'Hide' : 'Show'} aria-label={showPassword ? 'Hide password' : 'Show password'} onclick={() => (showPassword = !showPassword)}>
 						{#if showPassword}<EyeOff />{:else}<Eye />{/if}
 					</button>
 					<button class="btn btn-secondary btn-icon" title="Copy password" aria-label="Copy password" onclick={() => copyText(password, 'Password copied')}><Copy /></button>
 					<button class="btn btn-secondary btn-icon" title="Generate a new one" aria-label="Generate a new password" onclick={() => (password = generatePassword())}><RefreshCw /></button>
 				</div>
-				<p class="mt-1 text-[11px] text-muted-foreground">28 random letters and digits. “Switch this connection” below stores it encrypted; keep a copy if anything else will use this user.</p>
+				<p class="mt-1 text-[0.6875rem] text-muted-foreground">28 random letters and digits. “Switch this connection” below stores it encrypted; keep a copy if anything else will use this user.</p>
 			</div>
 
 			{#if !mysql}
@@ -220,12 +220,12 @@
 						>
 					</div>
 					{#if mode === 'read_all_data'}
-						<p class="mt-1.5 text-[11px] text-muted-foreground">The predefined role pg_read_all_data (Postgres 14+) reads every table, view and sequence in every schema — now and in the future — without per-schema grants or default privileges.</p>
+						<p class="mt-1.5 text-[0.6875rem] text-muted-foreground">The predefined role pg_read_all_data (Postgres 14+) reads every table, view and sequence in every schema — now and in the future — without per-schema grants or default privileges.</p>
 					{:else}
 						<div class="mt-2 flex flex-wrap gap-1.5">
 							{#each ctx.schemas ?? [] as s (s.name)}
 								<button
-									class="h-7 rounded-lg border px-2.5 font-mono text-[11px] transition-colors {picked.has(s.name) ? 'border-primary/30 bg-primary-soft text-primary' : 'border-border text-muted-foreground line-through decoration-muted-foreground/50'}"
+									class="h-7 rounded-lg border px-2.5 font-mono text-[0.6875rem] transition-colors {picked.has(s.name) ? 'border-primary/30 bg-primary-soft text-primary' : 'border-border text-muted-foreground line-through decoration-muted-foreground/50'}"
 									aria-pressed={picked.has(s.name)}
 									title={s.owners.length ? `Objects owned by ${s.owners.join(', ')}` : 'Empty schema'}
 									onclick={() => togglePick(s.name)}>{s.name}</button
@@ -248,21 +248,21 @@
 					<span class="label">Databases</span>
 					<div class="flex flex-wrap gap-1.5">
 						<button
-							class="h-7 rounded-lg border px-2.5 text-[11px] {allDatabases ? 'border-primary/30 bg-primary-soft text-primary' : 'border-border text-muted-foreground'}"
+							class="h-7 rounded-lg border px-2.5 text-[0.6875rem] {allDatabases ? 'border-primary/30 bg-primary-soft text-primary' : 'border-border text-muted-foreground'}"
 							aria-pressed={allDatabases}
 							onclick={() => (allDatabases = !allDatabases)}>All databases (*.*)</button
 						>
 						{#if !allDatabases}
 							{#each ctx.databases ?? [] as d (d)}
 								<button
-									class="h-7 rounded-lg border px-2.5 font-mono text-[11px] {picked.has(d) ? 'border-primary/30 bg-primary-soft text-primary' : 'border-border text-muted-foreground line-through decoration-muted-foreground/50'}"
+									class="h-7 rounded-lg border px-2.5 font-mono text-[0.6875rem] {picked.has(d) ? 'border-primary/30 bg-primary-soft text-primary' : 'border-border text-muted-foreground line-through decoration-muted-foreground/50'}"
 									aria-pressed={picked.has(d)}
 									onclick={() => togglePick(d)}>{d}</button
 								>
 							{/each}
 						{/if}
 					</div>
-					<p class="mt-1.5 text-[11px] text-muted-foreground">Grants SELECT and SHOW VIEW. Per-database grants also cover tables created later; *.* includes databases created later.</p>
+					<p class="mt-1.5 text-[0.6875rem] text-muted-foreground">Grants SELECT and SHOW VIEW. Per-database grants also cover tables created later; *.* includes databases created later.</p>
 				</div>
 			{/if}
 
@@ -297,7 +297,7 @@
 
 			<div class="overflow-hidden rounded-lg border border-border bg-background">
 				<div class="flex items-center gap-1 border-b border-border px-2 py-1">
-					<span class="mr-auto text-[11px] text-muted-foreground">Generated SQL — run it as an administrator</span>
+					<span class="mr-auto text-[0.6875rem] text-muted-foreground">Generated SQL — run it as an administrator</span>
 					<button class="btn btn-ghost btn-sm" onclick={() => (showInScript = !showInScript)} disabled={!preview}>
 						{#if showInScript}<EyeOff />Hide password{:else}<Eye />Show password{/if}
 					</button>
@@ -306,7 +306,7 @@
 				{#if previewError}
 					<p class="flex items-start gap-2 p-3 text-xs text-danger"><TriangleAlert class="mt-px size-3.5 shrink-0" />{previewError}</p>
 				{:else if preview}
-					<pre class="max-h-72 overflow-auto px-3 py-2 font-mono text-[11.5px] leading-relaxed whitespace-pre">{shownScript}</pre>
+					<pre class="max-h-72 overflow-auto px-3 py-2 font-mono text-[0.71875rem] leading-relaxed whitespace-pre">{shownScript}</pre>
 				{:else}
 					<div class="grid h-24 place-items-center"><LoaderCircle class="size-4 animate-spin text-muted-foreground" /></div>
 				{/if}
@@ -316,7 +316,7 @@
 				<div class="rounded-lg border border-danger/30 bg-danger/5 p-3 text-xs">
 					<p class="font-medium">Statement {applied.error.statementIndex + 1} failed{mysql && applied.applied ? ` — the ${applied.applied} before it were applied` : ' — nothing was changed'}</p>
 					<p class="mt-1 font-mono text-muted-foreground">{applied.error.message}</p>
-					<p class="mt-1 font-mono text-[11px] text-muted-foreground">{applied.error.sql}</p>
+					<p class="mt-1 font-mono text-[0.6875rem] text-muted-foreground">{applied.error.sql}</p>
 				</div>
 			{:else if applied?.ok}
 				<p class="flex items-center gap-2 rounded-lg border border-success/30 bg-success/5 p-3 text-xs">
@@ -331,7 +331,7 @@
 
 	{#snippet footer()}
 		{#if ctx}
-			<span class="mr-auto text-[11px] text-muted-foreground">
+			<span class="mr-auto text-[0.6875rem] text-muted-foreground">
 				{#if writable}Apply runs it on this connection now.{:else}Unlock writes on this connection to apply it here, or run the script yourself.{/if}
 			</span>
 			<button class="btn btn-secondary" disabled={!preview || applying || !writable} title={writable ? 'Run the statements now' : 'This connection is read-only right now'} onclick={apply}>

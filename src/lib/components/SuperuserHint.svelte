@@ -31,7 +31,7 @@
 </script>
 
 {#if currentUser && !dismissed}
-	<div class="relative flex items-center gap-2 border-t border-border bg-warning/5 px-4 py-1.5 text-[11px] text-muted-foreground">
+	<div class="relative flex items-center gap-2 border-t border-border bg-warning/5 px-4 py-1.5 text-[0.6875rem] text-muted-foreground">
 		<ShieldAlert class="size-3.5 shrink-0 text-warning" />
 		<span class="min-w-0 flex-1 truncate">
 			Connected as {conn.engine === 'mysql' ? 'admin' : 'superuser'} <span class="font-mono">{currentUser.replace(/@.*$/, '')}</span> ·

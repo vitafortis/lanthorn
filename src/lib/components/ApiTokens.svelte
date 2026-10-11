@@ -97,8 +97,8 @@
 		<div class="flex items-start gap-2">
 			<KeyRound class="mt-0.5 size-4 shrink-0 text-success" />
 			<div class="min-w-0 flex-1">
-				<p class="text-[13px] font-medium">Token “{created.record.name}” created — copy it now</p>
-				<p class="text-[11px] text-muted-foreground">Only a hash is stored, so it can't be shown again. Treat it like a password.</p>
+				<p class="text-[0.8125rem] font-medium">Token “{created.record.name}” created — copy it now</p>
+				<p class="text-[0.6875rem] text-muted-foreground">Only a hash is stored, so it can't be shown again. Treat it like a password.</p>
 			</div>
 			<button class="btn btn-ghost btn-icon btn-sm -mt-1 -mr-1" aria-label="Dismiss" onclick={() => (created = null)}><X /></button>
 		</div>
@@ -106,7 +106,7 @@
 			<code class="min-w-0 flex-1 font-mono text-xs break-all select-all">{created.token}</code>
 			<button class="btn btn-secondary btn-sm" onclick={() => copy(created!.token, 'Token copied')}><Copy />Copy</button>
 		</div>
-		<div class="mt-2 flex items-center gap-2 text-[11px] text-muted-foreground">
+		<div class="mt-2 flex items-center gap-2 text-[0.6875rem] text-muted-foreground">
 			<code class="min-w-0 flex-1 truncate font-mono">{curl}</code>
 			<button class="btn btn-ghost btn-sm" onclick={() => copy(curl, 'Command copied')}><Copy />curl</button>
 		</div>
@@ -116,7 +116,7 @@
 {#if tokens.length}
 	<div class="mt-4 overflow-hidden rounded-lg border border-border">
 		<table class="w-full text-xs">
-			<thead class="bg-surface text-left text-[11px] text-muted-foreground">
+			<thead class="bg-surface text-left text-[0.6875rem] text-muted-foreground">
 				<tr>
 					<th class="px-3 py-2 font-medium">Name</th>
 					<th class="px-3 py-2 font-medium">Token</th>
@@ -133,7 +133,7 @@
 							<span class="font-medium {dead ? 'line-through' : ''}">{t.name}</span>
 							{#if t.includeAddresses}<span class="badge badge-warning ml-1.5">addresses</span>{/if}
 							{#if t.revokedAt}<span class="badge ml-1.5">revoked</span>{:else if expired(t)}<span class="badge ml-1.5">expired</span>{/if}
-							<p class="text-[11px] text-muted-foreground">created {ago(t.createdAt)}{t.createdBy ? ` by ${t.createdBy}` : ''}</p>
+							<p class="text-[0.6875rem] text-muted-foreground">created {ago(t.createdAt)}{t.createdBy ? ` by ${t.createdBy}` : ''}</p>
 						</td>
 						<td class="px-3 py-2 font-mono text-muted-foreground">{t.prefix}…</td>
 						<td class="px-3 py-2 text-muted-foreground">{t.lastUsedAt ? ago(t.lastUsedAt) : 'never'}</td>
@@ -173,7 +173,7 @@
 	</label>
 	<button class="btn btn-primary h-8" disabled={busy || !form.name.trim()}>{#if busy}<LoaderCircle class="animate-spin" />{:else}<Plus />{/if}Create token</button>
 </form>
-<p class="mt-3 flex items-start gap-1.5 text-[11px] text-muted-foreground">
+<p class="mt-3 flex items-start gap-1.5 text-[0.6875rem] text-muted-foreground">
 	<CircleAlert class="mt-px size-3.5 shrink-0" />
 	<span>
 		Send it as <code class="font-mono">Authorization: Bearer pgm_…</code>. Widgets that can't set headers may use <code class="font-mono">?token=pgm_…</code>, but

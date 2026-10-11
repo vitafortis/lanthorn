@@ -85,11 +85,11 @@
 
 <div class="flex h-full min-h-0 flex-col">
 	{#if parsed.error}
-		<div class="m-3 rounded-xl border border-danger/30 bg-danger/5 p-4 text-[13px]">Couldn’t read this plan: {parsed.error}</div>
+		<div class="m-3 rounded-xl border border-danger/30 bg-danger/5 p-4 text-[0.8125rem]">Couldn’t read this plan: {parsed.error}</div>
 	{:else if summary}
 		<!-- Summary -->
 		<div class="flex flex-wrap items-center gap-x-4 gap-y-2 border-b border-border bg-surface px-3 py-2">
-			<div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px] text-muted-foreground">
+			<div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-[0.6875rem] text-muted-foreground">
 				<span class="badge {summary.analyzed ? 'badge-primary' : ''}">{summary.analyzed ? 'EXPLAIN ANALYZE' : 'EXPLAIN'}</span>
 				{#if summary.planningMs != null}<span>Planning <b class="font-medium text-foreground tabular-nums">{ms(summary.planningMs)}</b></span>{/if}
 				{#if summary.executionMs != null}<span>Execution <b class="font-medium text-foreground tabular-nums">{ms(summary.executionMs)}</b></span>{/if}
@@ -108,7 +108,7 @@
 					<span title="Just-in-time compilation">JIT <b class="font-medium text-foreground tabular-nums">{ms(summary.jit.totalMs)}</b>{summary.jit.functions != null ? ` · ${summary.jit.functions} functions` : ''}</span>
 				{/if}
 				{#if Object.keys(summary.settings).length}
-					<span class="font-mono text-[10.5px]" title="Planner settings that differ from the defaults">
+					<span class="font-mono text-[0.65625rem]" title="Planner settings that differ from the defaults">
 						{Object.entries(summary.settings)
 							.map(([k, v]) => `${k}=${v}`)
 							.join(' · ')}
@@ -117,7 +117,7 @@
 			</div>
 			<div class="ml-auto flex items-center gap-1">
 				{#if !raw}
-					<label class="mr-1 flex cursor-pointer items-center gap-1.5 text-[11px] text-muted-foreground select-none" title="Show each node's output columns (VERBOSE)">
+					<label class="mr-1 flex cursor-pointer items-center gap-1.5 text-[0.6875rem] text-muted-foreground select-none" title="Show each node's output columns (VERBOSE)">
 						<input type="checkbox" class="accent-primary" bind:checked={showOutput} />Output
 					</label>
 					{#if collapsed.size}
@@ -133,7 +133,7 @@
 		</div>
 
 		{#if executedWrite}
-			<div class="flex items-start gap-2 border-b border-warning/30 bg-warning/10 px-3 py-2 text-[12px]">
+			<div class="flex items-start gap-2 border-b border-warning/30 bg-warning/10 px-3 py-2 text-xs">
 				<Undo2 class="mt-0.5 size-3.5 shrink-0 text-warning" />
 				<p>
 					<b class="font-medium">EXPLAIN ANALYZE executed this statement, then rolled it back.</b>
@@ -143,11 +143,11 @@
 		{/if}
 
 		{#if raw}
-			<pre class="min-h-0 flex-1 overflow-auto bg-surface/40 p-3 font-mono text-[11.5px] leading-relaxed">{json}</pre>
+			<pre class="min-h-0 flex-1 overflow-auto bg-surface/40 p-3 font-mono text-[0.71875rem] leading-relaxed">{json}</pre>
 		{:else}
 			<div class="min-h-0 flex-1 overflow-auto">
-				<div class="min-w-fit text-[12px]">
-					<div class="sticky top-0 z-10 grid border-b border-border bg-surface/95 text-[10px] font-semibold tracking-wider text-muted-foreground uppercase backdrop-blur" style={grid}>
+				<div class="min-w-fit text-xs">
+					<div class="sticky top-0 z-10 grid border-b border-border bg-surface/95 text-[0.625rem] font-semibold tracking-wider text-muted-foreground uppercase backdrop-blur" style={grid}>
 						<div class="px-3 py-1.5">Node</div>
 						{#if summary.analyzed}
 							<div class="px-2 py-1.5 text-right" title="Estimated → actual rows per loop">Rows est → act</div>
@@ -181,14 +181,14 @@
 									{/if}
 									{#if n.subplanName}<span class="badge shrink-0">{n.subplanName}</span>{:else if n.relationship && !['Outer', 'Inner', 'Member'].includes(n.relationship)}<span class="badge shrink-0">{n.relationship}</span>{/if}
 									<span class="shrink-0 font-semibold {n.neverExecuted ? 'text-muted-foreground' : ''}">{n.nodeType}</span>
-									{#if n.target}<span class="min-w-0 font-mono text-[11.5px] break-all text-primary">{n.target}</span>{/if}
+									{#if n.target}<span class="min-w-0 font-mono text-[0.71875rem] break-all text-primary">{n.target}</span>{/if}
 									{#each n.tags as tag (tag)}<span class="badge shrink-0">{tag}</span>{/each}
 									{#if n.slowest}<span class="badge badge-warning shrink-0"><Flame />{summary.analyzed ? 'slowest' : 'costliest'}</span>{/if}
 									{#if n.neverExecuted}<span class="badge shrink-0">never executed</span>{/if}
-									{#if !open}<span class="text-[11px] text-muted-foreground">+{n.children.length} hidden</span>{/if}
+									{#if !open}<span class="text-[0.6875rem] text-muted-foreground">+{n.children.length} hidden</span>{/if}
 								</div>
 								{#if n.details.length || n.rowsRemovedByFilter || n.rowsRemovedByJoinFilter || n.rowsRemovedByRecheck || n.notes.length || (summary.analyzed && n.sharedHit != null)}
-									<div class="mt-0.5 space-y-px pl-5 font-mono text-[11px] leading-snug text-muted-foreground">
+									<div class="mt-0.5 space-y-px pl-5 font-mono text-[0.6875rem] leading-snug text-muted-foreground">
 										{#each n.details as d (d.label)}
 											{#if d.label !== 'Output' || showOutput}
 												<p class="break-words"><span class="text-foreground/70">{d.label}:</span> {d.value}</p>
@@ -200,7 +200,7 @@
 										{#if summary.analyzed && n.sharedHit != null && (n.sharedHit || n.sharedRead)}
 											<p><span class="text-foreground/70">Buffers:</span> shared hit {int(n.sharedHit)}{n.sharedRead ? ` · read ${int(n.sharedRead)}` : ''}</p>
 										{/if}
-										{#if n.notes.length}<p class="font-sans text-[10.5px]">{n.notes.join(' · ')}</p>{/if}
+										{#if n.notes.length}<p class="font-sans text-[0.65625rem]">{n.notes.join(' · ')}</p>{/if}
 									</div>
 								{/if}
 							</div>
@@ -214,7 +214,7 @@
 										<span class={n.misestimated ? 'font-semibold text-warning' : ''}>{rowsLabel(n.actualRows)}</span>
 										{#if n.misestimated}
 											<span
-												class="mt-0.5 ml-auto flex w-fit items-center gap-0.5 rounded bg-warning/15 px-1 text-[10px] font-medium text-warning"
+												class="mt-0.5 ml-auto flex w-fit items-center gap-0.5 rounded bg-warning/15 px-1 text-[0.625rem] font-medium text-warning"
 												title="The planner {n.estimateDirection === 'under' ? 'underestimated' : 'overestimated'} rows {Math.round(n.estimateFactor ?? 0)}× — check statistics (ANALYZE) or correlated columns"
 											>
 												<TriangleAlert class="size-2.5" />{n.estimateDirection === 'under' ? '↑' : '↓'}{n.estimateFactor! >= 100 ? int(Math.round(n.estimateFactor!)) : n.estimateFactor!.toFixed(n.estimateFactor! < 20 ? 1 : 0)}×
@@ -223,12 +223,12 @@
 									{/if}
 								</div>
 								<div class="px-2 py-1.5 text-right text-muted-foreground tabular-nums">{n.loops != null ? int(n.loops) : '—'}</div>
-								<div class="px-2 py-1.5 text-right font-mono text-[11px] text-muted-foreground tabular-nums" title="startup {n.startupCost} · total {n.totalCost}">{cost(n.startupCost)}<span class="opacity-50">..</span>{cost(n.totalCost)}</div>
+								<div class="px-2 py-1.5 text-right font-mono text-[0.6875rem] text-muted-foreground tabular-nums" title="startup {n.startupCost} · total {n.totalCost}">{cost(n.startupCost)}<span class="opacity-50">..</span>{cost(n.totalCost)}</div>
 								<div class="px-2 py-1.5 text-right tabular-nums">{ms(n.inclusiveMs)}</div>
 								<div class="px-3 py-1.5">
 									<div class="flex items-baseline justify-between gap-2 tabular-nums">
 										<span class={n.slowest ? 'font-semibold text-warning' : ''}>{ms(n.exclusiveMs)}</span>
-										<span class="text-[10.5px] text-muted-foreground">{pct(n.share)}</span>
+										<span class="text-[0.65625rem] text-muted-foreground">{pct(n.share)}</span>
 									</div>
 									<div class="mt-1 h-1.5 overflow-hidden rounded-full bg-muted" title="{pct(n.share)} of total self time">
 										<div class="h-full rounded-full {n.slowest ? 'bg-warning' : 'bg-primary/70'}" style="width:{Math.max(n.share > 0 ? 1.5 : 0, n.share * 100)}%"></div>
@@ -236,11 +236,11 @@
 								</div>
 							{:else}
 								<div class="px-2 py-1.5 text-right tabular-nums">{rowsLabel(n.planRows)}</div>
-								<div class="px-2 py-1.5 text-right font-mono text-[11px] text-muted-foreground tabular-nums">{cost(n.startupCost)}<span class="opacity-50">..</span>{cost(n.totalCost)}</div>
+								<div class="px-2 py-1.5 text-right font-mono text-[0.6875rem] text-muted-foreground tabular-nums">{cost(n.startupCost)}<span class="opacity-50">..</span>{cost(n.totalCost)}</div>
 								<div class="px-3 py-1.5">
 									<div class="flex items-baseline justify-between gap-2 tabular-nums">
 										<span class={n.slowest ? 'font-semibold text-warning' : ''}>{cost(n.exclusiveCost)}</span>
-										<span class="text-[10.5px] text-muted-foreground">{pct(n.share)}</span>
+										<span class="text-[0.65625rem] text-muted-foreground">{pct(n.share)}</span>
 									</div>
 									<div class="mt-1 h-1.5 overflow-hidden rounded-full bg-muted" title="{pct(n.share)} of total cost">
 										<div class="h-full rounded-full {n.slowest ? 'bg-warning' : 'bg-primary/70'}" style="width:{Math.max(n.share > 0 ? 1.5 : 0, n.share * 100)}%"></div>
@@ -253,7 +253,7 @@
 			</div>
 		{/if}
 
-		<div class="flex min-w-0 items-center gap-3 border-t border-border bg-surface px-3 py-1.5 text-[11px] whitespace-nowrap text-muted-foreground">
+		<div class="flex min-w-0 items-center gap-3 border-t border-border bg-surface px-3 py-1.5 text-[0.6875rem] whitespace-nowrap text-muted-foreground">
 			<span class="font-medium text-foreground">EXPLAIN</span>
 			{#if summary.analyzed}
 				<span class="truncate">Self time = node time × loops − children{summary.nodes.some((n) => n.notes.some((x) => x.includes('workers'))) ? ' (parallel workers averaged)' : ''}</span>

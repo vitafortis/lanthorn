@@ -193,8 +193,8 @@
 	<header class="flex h-14 shrink-0 items-center gap-3 border-b border-border px-4">
 		<span class="size-2.5 rounded-full" style="background:{COLORS[conn.color] ?? COLORS.violet}; box-shadow:0 0 10px {COLORS[conn.color] ?? COLORS.violet}"></span>
 		<div class="min-w-0">
-			<h1 class="truncate text-[14px] leading-tight font-semibold">{conn.name}</h1>
-			<p class="truncate font-mono text-[11px] text-muted-foreground" title={connectionAddress(conn)}>{connectionAddress(conn)}</p>
+			<h1 class="truncate text-sm leading-tight font-semibold">{conn.name}</h1>
+			<p class="truncate font-mono text-[0.6875rem] text-muted-foreground" title={connectionAddress(conn)}>{connectionAddress(conn)}</p>
 		</div>
 		<EngineBadge {engine} flavor={conn.flavor} />
 		<WriteAccess {conn} />
@@ -225,7 +225,7 @@
 				{#each tabs as t (t.id)}
 					{@const isActive = t.id === activeId}
 					<div
-						class="group relative flex h-8 max-w-52 shrink-0 items-center gap-1.5 rounded-t-lg border-x border-t pr-1 pl-2.5 text-[12px] {isActive
+						class="group relative flex h-8 max-w-52 shrink-0 items-center gap-1.5 rounded-t-lg border-x border-t pr-1 pl-2.5 text-xs {isActive
 							? 'border-border bg-background text-foreground'
 							: 'border-transparent text-muted-foreground hover:text-foreground'}"
 					>
@@ -273,8 +273,8 @@
 								<div class="flex items-center gap-2 border-b border-border px-3 py-1.5">
 									<span class="font-mono text-xs"><span class="text-muted-foreground">{t.schema}.</span><span class="font-medium">{t.table}</span></span>
 									<div class="ml-2 inline-flex rounded-md border border-border bg-surface p-0.5">
-										<button class="flex h-6 items-center gap-1 rounded px-2 text-[11px] {t.view === 'data' ? 'bg-card text-foreground shadow-surface' : 'text-muted-foreground'}" onclick={() => (t.view = 'data')}><Rows3 class="size-3" />Data</button>
-										<button class="flex h-6 items-center gap-1 rounded px-2 text-[11px] {t.view === 'structure' ? 'bg-card text-foreground shadow-surface' : 'text-muted-foreground'}" onclick={() => (t.view = 'structure')}><Columns3 class="size-3" />Structure</button>
+										<button class="flex h-6 items-center gap-1 rounded px-2 text-[0.6875rem] {t.view === 'data' ? 'bg-card text-foreground shadow-surface' : 'text-muted-foreground'}" onclick={() => (t.view = 'data')}><Rows3 class="size-3" />Data</button>
+										<button class="flex h-6 items-center gap-1 rounded px-2 text-[0.6875rem] {t.view === 'structure' ? 'bg-card text-foreground shadow-surface' : 'text-muted-foreground'}" onclick={() => (t.view = 'structure')}><Columns3 class="size-3" />Structure</button>
 									</div>
 								</div>
 								<div class="min-h-0 flex-1">

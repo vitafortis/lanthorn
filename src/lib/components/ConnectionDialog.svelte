@@ -196,8 +196,8 @@
 						: 'text-muted-foreground hover:text-foreground'}"
 					onclick={() => setEngine(e.value as Engine)}
 				>
-					<span class="text-[13px] font-medium">{e.label}</span>
-					<span class="text-[11px] opacity-70">{e.sub}</span>
+					<span class="text-[0.8125rem] font-medium">{e.label}</span>
+					<span class="text-[0.6875rem] opacity-70">{e.sub}</span>
 				</button>
 			{/each}
 		</div>
@@ -238,13 +238,13 @@
 			<div>
 				<label class="label" for="c-path">Database file</label>
 				{#if snapshot}
-					<p class="input flex h-9 items-center truncate font-mono text-[13px] text-muted-foreground" title="Snapshot of {snapshot.container}:{snapshot.containerPath}">
+					<p class="input flex h-9 items-center truncate font-mono text-[0.8125rem] text-muted-foreground" title="Snapshot of {snapshot.container}:{snapshot.containerPath}">
 						{snapshot.container}:{snapshot.containerPath}
 					</p>
-					<p class="mt-1 text-[11px] text-muted-foreground">A snapshot copied out of the container — refresh it from the connection’s page.</p>
+					<p class="mt-1 text-[0.6875rem] text-muted-foreground">A snapshot copied out of the container — refresh it from the connection’s page.</p>
 				{:else}
-					<input id="c-path" class="input font-mono text-[13px]" required placeholder="/appdata/sonarr/sonarr.db" bind:value={form.database} />
-					<p class="mt-1 text-[11px] text-muted-foreground">
+					<input id="c-path" class="input font-mono text-[0.8125rem]" required placeholder="/appdata/sonarr/sonarr.db" bind:value={form.database} />
+					<p class="mt-1 text-[0.6875rem] text-muted-foreground">
 						The path as pg·modern sees it — inside its container, mount the app’s folder (e.g. <code class="font-mono">/opt/appdata:/appdata</code>).
 					</p>
 				{/if}
@@ -253,11 +253,11 @@
 		<div class="grid grid-cols-[1fr_7rem] gap-3">
 			<div>
 				<label class="label" for="c-host">Host</label>
-				<input id="c-host" class="input font-mono text-[13px]" required placeholder="10.0.0.20 or db.lan" bind:value={form.host} />
+				<input id="c-host" class="input font-mono text-[0.8125rem]" required placeholder="10.0.0.20 or db.lan" bind:value={form.host} />
 			</div>
 			<div>
 				<label class="label" for="c-port">Port</label>
-				<input id="c-port" class="input font-mono text-[13px]" type="number" min="1" max="65535" required bind:value={form.port} />
+				<input id="c-port" class="input font-mono text-[0.8125rem]" type="number" min="1" max="65535" required bind:value={form.port} />
 			</div>
 		</div>
 
@@ -266,7 +266,7 @@
 				<label class="label" for="c-db">{form.engine === 'mysql' ? 'Default database' : 'Database'}</label>
 				<input
 					id="c-db"
-					class="input font-mono text-[13px]"
+					class="input font-mono text-[0.8125rem]"
 					required={form.engine === 'postgres'}
 					placeholder={form.engine === 'mysql' ? 'optional — all are listed' : ''}
 					bind:value={form.database}
@@ -274,7 +274,7 @@
 			</div>
 			<div>
 				<label class="label" for="c-user">User</label>
-				<input id="c-user" class="input font-mono text-[13px]" required bind:value={form.user} />
+				<input id="c-user" class="input font-mono text-[0.8125rem]" required bind:value={form.user} />
 			</div>
 		</div>
 
@@ -282,7 +282,7 @@
 			<div>
 				<label class="label" for="c-pass">Password</label>
 				{#if changePassword}
-					<input id="c-pass" class="input font-mono text-[13px]" type="password" autocomplete="new-password" bind:value={form.password} />
+					<input id="c-pass" class="input font-mono text-[0.8125rem]" type="password" autocomplete="new-password" bind:value={form.password} />
 				{:else}
 					<button type="button" class="btn btn-secondary h-9 w-full justify-start font-normal text-muted-foreground" onclick={() => (changePassword = true)}>
 						<Lock />Stored securely — change
@@ -310,7 +310,7 @@
 				{#if form.readOnly}<Lock class="size-4 text-primary" />{:else}<PencilLine class="size-4 text-warning" />{/if}
 			</div>
 			<div class="flex-1">
-				<p class="text-[13px] font-medium">{form.readOnly ? 'Read-only' : 'Read/write'}</p>
+				<p class="text-[0.8125rem] font-medium">{form.readOnly ? 'Read-only' : 'Read/write'}</p>
 				<p class="mt-0.5 text-xs text-muted-foreground">
 					{#if snapshot}
 						A copy of a database taken out of a container. Writes would only change the copy, so it is always read-only.
@@ -345,7 +345,7 @@
 			>
 				<ShieldCheck class="size-4 shrink-0 text-primary" />
 				<span class="flex-1">
-					<span class="block text-[13px] font-medium">Create a read-only user for pg·modern</span>
+					<span class="block text-[0.8125rem] font-medium">Create a read-only user for pg·modern</span>
 					<span class="block text-xs text-muted-foreground">Generate SQL for a dedicated login with only read privileges, then switch this connection to it.</span>
 				</span>
 			</button>

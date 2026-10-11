@@ -255,17 +255,17 @@
 			/>
 		</div>
 		{#if needle}
-			<span class="text-[11px] text-muted-foreground tabular-nums">{matches.size} {matches.size === 1 ? 'match' : 'matches'}</span>
+			<span class="text-[0.6875rem] text-muted-foreground tabular-nums">{matches.size} {matches.size === 1 ? 'match' : 'matches'}</span>
 		{/if}
 		<div class="ml-auto flex items-center gap-3">
 			{#if data}
-				<span class="text-[11px] text-muted-foreground tabular-nums">
+				<span class="text-[0.6875rem] text-muted-foreground tabular-nums">
 					{ownTables} {ownTables === 1 ? 'table' : 'tables'} · {data.foreignKeys.length} {data.foreignKeys.length === 1 ? 'relation' : 'relations'}
 				</span>
 				{#if data.truncated}<span class="badge badge-warning" title="The diagram shows the first {ownTables} relations">Truncated</span>{/if}
 			{/if}
-			<span class="flex items-center gap-1.5 text-[11px] text-muted-foreground"><Switch bind:checked={compact} label="Show only key columns" />Keys only</span>
-			<span class="flex items-center gap-1.5 text-[11px] text-muted-foreground"><Switch bind:checked={views} label="Include views" />Views</span>
+			<span class="flex items-center gap-1.5 text-[0.6875rem] text-muted-foreground"><Switch bind:checked={compact} label="Show only key columns" />Keys only</span>
+			<span class="flex items-center gap-1.5 text-[0.6875rem] text-muted-foreground"><Switch bind:checked={views} label="Include views" />Views</span>
 			<button class="btn btn-secondary btn-sm" onclick={exportSvg} disabled={!layout?.nodes.length}><Download />Export SVG</button>
 		</div>
 	</div>
@@ -385,7 +385,7 @@
 				</g>
 			</svg>
 
-			<div class="absolute bottom-3 left-3 flex items-center gap-3 rounded-lg border border-border bg-card/90 px-2.5 py-1.5 text-[11px] text-muted-foreground shadow-surface backdrop-blur-sm">
+			<div class="absolute bottom-3 left-3 flex items-center gap-3 rounded-lg border border-border bg-card/90 px-2.5 py-1.5 text-[0.6875rem] text-muted-foreground shadow-surface backdrop-blur-sm">
 				<span class="flex items-center gap-1"><KeyRound class="size-3 text-warning" />primary key</span>
 				<span class="flex items-center gap-1"><Link2 class="size-3 text-primary" />foreign key</span>
 				<span><span class="text-foreground">*</span> not null</span>
@@ -393,7 +393,7 @@
 
 			<div class="absolute right-3 bottom-3 flex items-center gap-0.5 rounded-lg border border-border bg-card/90 p-0.5 shadow-surface backdrop-blur-sm">
 				<button class="btn btn-ghost btn-icon btn-sm" title="Zoom out" onclick={() => zoomButton(1 / 1.25)}><Minus /></button>
-				<button class="h-7 w-11 rounded-md text-[11px] text-muted-foreground tabular-nums hover:bg-accent hover:text-foreground" title="Reset to 100%" onclick={() => zoomButton(1 / view.k)}>
+				<button class="h-7 w-11 rounded-md text-[0.6875rem] text-muted-foreground tabular-nums hover:bg-accent hover:text-foreground" title="Reset to 100%" onclick={() => zoomButton(1 / view.k)}>
 					{Math.round(view.k * 100)}%
 				</button>
 				<button class="btn btn-ghost btn-icon btn-sm" title="Zoom in" onclick={() => zoomButton(1.25)}><Plus /></button>

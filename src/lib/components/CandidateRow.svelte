@@ -64,8 +64,8 @@
 	/>
 
 	<div class="min-w-0">
-		<input class="input h-8 text-[13px] font-medium" bind:value={choice.name} />
-		<p class="mt-1.5 flex min-w-0 items-center gap-1.5 font-mono text-[11px] text-muted-foreground" title="{candidate.user}@…/{candidate.database}">
+		<input class="input h-8 text-[0.8125rem] font-medium" bind:value={choice.name} />
+		<p class="mt-1.5 flex min-w-0 items-center gap-1.5 font-mono text-[0.6875rem] text-muted-foreground" title="{candidate.user}@…/{candidate.database}">
 			<EngineBadge engine={candidate.engine ?? 'postgres'} flavor={candidate.flavor} />
 			{#if lite}
 				<span class="truncate" title={lite.containerPath ?? candidate.database}>{lite.app ?? 'SQLite file'}{lite.sizeBytes != null ? ` · ${bytes(lite.sizeBytes)}` : ''}</span>
@@ -107,7 +107,7 @@
 			<NetworkPathView path={candidate.network} reachable={candidate.reachable} />
 		{/if}
 		{#if candidate.saved?.addressChanged}
-			<div class="mt-2 rounded-lg border border-warning/30 bg-warning/5 px-2.5 py-2 text-[11px]">
+			<div class="mt-2 rounded-lg border border-warning/30 bg-warning/5 px-2.5 py-2 text-[0.6875rem]">
 				<p class="text-foreground">
 					Saved as <a class="font-medium text-primary hover:underline" href="/c/{candidate.saved.id}">{candidate.saved.name}</a>
 					on <span class="font-mono">{candidate.saved.host}:{candidate.saved.port}</span>{candidate.reachable ? ', but this scan reaches it elsewhere.' : '.'}
@@ -123,7 +123,7 @@
 			<input class="input mt-2 h-8 font-mono text-xs" type="password" placeholder="Password (optional)" bind:value={choice.password} />
 		{/if}
 		{#each candidate.notes as note (note)}
-			<p class="mt-1.5 flex items-start gap-1 text-[11px] text-warning"><CircleAlert class="mt-px size-3 shrink-0" />{note}</p>
+			<p class="mt-1.5 flex items-start gap-1 text-[0.6875rem] text-warning"><CircleAlert class="mt-px size-3 shrink-0" />{note}</p>
 		{/each}
 	</div>
 

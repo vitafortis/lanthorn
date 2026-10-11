@@ -185,7 +185,7 @@
 {#if !data.destinations.length}
 	<div class="card px-6 py-12 text-center">
 		<p class="text-sm font-medium">No destinations yet</p>
-		<p class="mx-auto mt-1 max-w-lg text-[13px] text-muted-foreground">
+		<p class="mx-auto mt-1 max-w-lg text-[0.8125rem] text-muted-foreground">
 			For a NAS, the simplest route is mounting an NFS or CIFS/SMB share as a Docker volume (see the README) and using it as a folder.
 			SFTP and S3-compatible storage need no mount at all.
 		</p>
@@ -197,7 +197,7 @@
 			<div class="flex flex-wrap items-center gap-4 px-4 py-3">
 				<div class="grid size-9 shrink-0 place-items-center rounded-lg border border-border bg-surface text-primary"><k.icon class="size-4" /></div>
 				<div class="min-w-0 flex-1">
-					<p class="truncate text-[13px] font-medium">{d.name} <span class="ml-1 badge">{k.label}</span></p>
+					<p class="truncate text-[0.8125rem] font-medium">{d.name} <span class="ml-1 badge">{k.label}</span></p>
 					<p class="mt-0.5 truncate font-mono text-xs text-muted-foreground">{d.where}</p>
 				</div>
 				<div class="flex flex-wrap gap-1.5">
@@ -229,8 +229,8 @@
 					onclick={() => ((form.kind = k.key), (result = null))}
 				>
 					<k.icon class="size-4 {form.kind === k.key ? 'text-primary' : 'text-muted-foreground'}" />
-					<p class="mt-1.5 text-[13px] font-medium">{k.label}</p>
-					<p class="mt-0.5 text-[11px] leading-snug text-muted-foreground">{k.hint}</p>
+					<p class="mt-1.5 text-[0.8125rem] font-medium">{k.label}</p>
+					<p class="mt-0.5 text-[0.6875rem] leading-snug text-muted-foreground">{k.hint}</p>
 				</button>
 			{/each}
 		</div>
@@ -284,7 +284,7 @@
 			{:else}
 				<div>
 					<label class="label" for="d-key">Private key (OpenSSH or PEM)</label>
-					<textarea id="d-key" class="input h-24 py-2 font-mono text-[11px]" spellcheck="false" placeholder={keep(form.has.privateKey) || '-----BEGIN OPENSSH PRIVATE KEY-----'} bind:value={form.privateKey}></textarea>
+					<textarea id="d-key" class="input h-24 py-2 font-mono text-[0.6875rem]" spellcheck="false" placeholder={keep(form.has.privateKey) || '-----BEGIN OPENSSH PRIVATE KEY-----'} bind:value={form.privateKey}></textarea>
 				</div>
 				<div>
 					<label class="label" for="d-phrase">Key passphrase <span class="opacity-60">(optional)</span></label>
@@ -328,7 +328,7 @@
 			</div>
 			<div class="flex items-center justify-between gap-3">
 				<div>
-					<p class="text-[13px]">Path-style URLs</p>
+					<p class="text-[0.8125rem]">Path-style URLs</p>
 					<p class="text-xs text-muted-foreground">endpoint/bucket/key — MinIO, Garage and most NAS servers need this.</p>
 				</div>
 				<Switch bind:checked={form.pathStyle} label="Path-style URLs" />

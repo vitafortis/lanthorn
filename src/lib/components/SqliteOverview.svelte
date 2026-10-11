@@ -46,7 +46,7 @@
 <div class="h-full overflow-y-auto">
 	{#if error}
 		<div class="m-5 rounded-xl border border-danger/30 bg-danger/5 p-4">
-			<p class="text-[13px] font-medium">Could not open the database</p>
+			<p class="text-[0.8125rem] font-medium">Could not open the database</p>
 			<p class="mt-1 font-mono text-xs text-muted-foreground">{error}</p>
 		</div>
 	{:else if !data}
@@ -58,14 +58,14 @@
 					<div class="card p-4">
 						<div class="flex items-center gap-2 text-xs text-muted-foreground"><s.icon class="size-3.5 text-primary" />{s.label}</div>
 						<p class="mt-2 text-xl font-semibold tracking-tight tabular-nums">{s.value}</p>
-						<p class="mt-0.5 truncate text-[11px] text-muted-foreground">{s.sub}</p>
+						<p class="mt-0.5 truncate text-[0.6875rem] text-muted-foreground">{s.sub}</p>
 					</div>
 				{/each}
 			</div>
 
 			<div class="grid gap-5 xl:grid-cols-[1.4fr_1fr]">
 				<section class="card p-4">
-					<h3 class="mb-3 flex items-center gap-2 text-[13px] font-semibold">
+					<h3 class="mb-3 flex items-center gap-2 text-[0.8125rem] font-semibold">
 						<Table2 class="size-4 text-primary" />Largest tables
 						{#if !data.sizesKnown}<span class="font-normal text-muted-foreground">by rows{data.rowsExact ? '' : ' (estimates from sqlite_stat1)'}</span>{/if}
 					</h3>
@@ -73,10 +73,10 @@
 						{#each data.largestTables as t (t.name)}
 							<button class="group relative block w-full overflow-hidden rounded-md px-2 py-1.5 text-left hover:bg-accent/50" onclick={() => onopen(t.schema, t.name)}>
 								<div class="absolute inset-y-0 left-0 rounded-md bg-primary-soft" style="width:{((data.sizesKnown ? t.sizeBytes : t.estimatedRows) / maxTable) * 100}%"></div>
-								<div class="relative flex items-center gap-3 text-[13px]">
+								<div class="relative flex items-center gap-3 text-[0.8125rem]">
 									<span class="truncate font-mono text-xs">{t.name}</span>
-									<span class="ml-auto text-[11px] text-muted-foreground tabular-nums">{compact(t.estimatedRows)} rows</span>
-									{#if data.sizesKnown}<span class="w-16 text-right text-[11px] font-medium tabular-nums">{bytes(t.sizeBytes)}</span>{/if}
+									<span class="ml-auto text-[0.6875rem] text-muted-foreground tabular-nums">{compact(t.estimatedRows)} rows</span>
+									{#if data.sizesKnown}<span class="w-16 text-right text-[0.6875rem] font-medium tabular-nums">{bytes(t.sizeBytes)}</span>{/if}
 								</div>
 							</button>
 						{:else}
@@ -87,8 +87,8 @@
 
 				<div class="space-y-5">
 					<section class="card p-4">
-						<h3 class="mb-3 flex items-center gap-2 text-[13px] font-semibold"><FileText class="size-4 text-primary" />File</h3>
-						<dl class="space-y-2 text-[13px]">
+						<h3 class="mb-3 flex items-center gap-2 text-[0.8125rem] font-semibold"><FileText class="size-4 text-primary" />File</h3>
+						<dl class="space-y-2 text-[0.8125rem]">
 							<div class="flex items-start justify-between gap-3"><dt class="shrink-0 text-muted-foreground">{data.snapshot ? 'In container' : 'Path'}</dt><dd class="min-w-0 font-mono text-xs break-all">{data.snapshot ? `${data.snapshot.container}:${data.snapshot.containerPath}` : data.path}</dd></div>
 							<div class="flex items-center justify-between"><dt class="text-muted-foreground">Page size</dt><dd class="font-mono text-xs">{bytes(data.pageSize)}</dd></div>
 							<div class="flex items-center justify-between"><dt class="text-muted-foreground">Journal mode</dt><dd class="font-mono text-xs">{data.journalMode}</dd></div>
@@ -98,11 +98,11 @@
 						</dl>
 					</section>
 					<section class="card p-4">
-						<h3 class="mb-3 flex items-center gap-2 text-[13px] font-semibold"><ShieldCheck class="size-4 text-primary" />Access</h3>
-						<dl class="space-y-2 text-[13px]">
+						<h3 class="mb-3 flex items-center gap-2 text-[0.8125rem] font-semibold"><ShieldCheck class="size-4 text-primary" />Access</h3>
+						<dl class="space-y-2 text-[0.8125rem]">
 							<div class="flex items-center justify-between"><dt class="text-muted-foreground">pg·modern mode</dt><dd>{#if readOnly}<span class="badge badge-primary">read-only</span>{:else}<span class="badge badge-warning">read/write</span>{/if}</dd></div>
 						</dl>
-						<p class="mt-3 rounded-lg bg-surface p-2.5 text-[11px] text-muted-foreground">
+						<p class="mt-3 rounded-lg bg-surface p-2.5 text-[0.6875rem] text-muted-foreground">
 							{#if data.snapshot}
 								<FileStack class="mr-1 inline size-3" />A snapshot copied out of the container; the app keeps writing to the original. Refresh the snapshot to see new data.
 							{:else if readOnly}
@@ -115,7 +115,7 @@
 				</div>
 			</div>
 
-			<p class="font-mono text-[11px] text-muted-foreground/70">{data.version}</p>
+			<p class="font-mono text-[0.6875rem] text-muted-foreground/70">{data.version}</p>
 		</div>
 	{/if}
 </div>

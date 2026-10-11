@@ -112,11 +112,11 @@
 
 	<div class="max-w-5xl space-y-5 px-8 pb-10">
 		<div class="grid gap-3 md:grid-cols-2">
-			<div class="card p-4 text-[13px]">
+			<div class="card p-4 text-[0.8125rem]">
 				<p class="flex items-center gap-2 font-medium"><ShieldCheck class="size-4 text-primary" />Admin</p>
 				<p class="mt-1 text-xs text-muted-foreground">Everything: connections, discovery, settings, users, and writes on read/write connections.</p>
 			</div>
-			<div class="card p-4 text-[13px]">
+			<div class="card p-4 text-[0.8125rem]">
 				<p class="flex items-center gap-2 font-medium"><UserCheck class="size-4 text-primary" />Viewer</p>
 				<p class="mt-1 text-xs text-muted-foreground">Browse and query every connection, or only the ones you pick, in a read-only transaction. You can let them unlock writes on specific connections. Can't see discovery, settings or credentials.</p>
 			</div>
@@ -137,8 +137,8 @@
 			{#if loading}
 				<div class="grid h-32 place-items-center"><LoaderCircle class="size-5 animate-spin text-muted-foreground" /></div>
 			{:else}
-				<table class="w-full text-left text-[13px]">
-					<thead class="border-b border-border bg-surface text-[11px] text-muted-foreground">
+				<table class="w-full text-left text-[0.8125rem]">
+					<thead class="border-b border-border bg-surface text-[0.6875rem] text-muted-foreground">
 						<tr>
 							<th class="px-4 py-2 font-medium">User</th>
 							<th class="px-4 py-2 font-medium">Sign-in</th>
@@ -153,10 +153,10 @@
 							<tr class={u.disabled ? 'opacity-50' : ''}>
 								<td class="px-4 py-2.5">
 									<div class="flex items-center gap-2.5">
-										<span class="grid size-7 shrink-0 place-items-center rounded-full bg-primary-soft text-[11px] font-semibold text-primary uppercase">{(u.name ?? u.email).slice(0, 1)}</span>
+										<span class="grid size-7 shrink-0 place-items-center rounded-full bg-primary-soft text-[0.6875rem] font-semibold text-primary uppercase">{(u.name ?? u.email).slice(0, 1)}</span>
 										<div class="min-w-0">
-											<p class="truncate font-medium">{u.name ?? u.email}{#if isSelf(u)}<span class="ml-1.5 text-[11px] font-normal text-muted-foreground">(you)</span>{/if}</p>
-											{#if u.name}<p class="truncate text-[11px] text-muted-foreground">{u.email}</p>{/if}
+											<p class="truncate font-medium">{u.name ?? u.email}{#if isSelf(u)}<span class="ml-1.5 text-[0.6875rem] font-normal text-muted-foreground">(you)</span>{/if}</p>
+											{#if u.name}<p class="truncate text-[0.6875rem] text-muted-foreground">{u.email}</p>{/if}
 										</div>
 									</div>
 								</td>
@@ -244,7 +244,7 @@
 </Dialog>
 
 <Dialog bind:open={() => confirmDelete !== null, (v) => !v && (confirmDelete = null)} title="Delete user?" description="They'll be signed out immediately. Saved connections are not affected.">
-	<p class="text-[13px]">{confirmDelete?.email}</p>
+	<p class="text-[0.8125rem]">{confirmDelete?.email}</p>
 	{#snippet footer()}
 		<button class="btn btn-secondary" onclick={() => (confirmDelete = null)}>Cancel</button>
 		<button class="btn btn-danger" onclick={() => confirmDelete && remove(confirmDelete)}>Delete</button>
@@ -271,7 +271,7 @@
 			{#each connections.list as c (c.id)}
 				{@const g = grants[c.id]}
 				{#if g}
-					<div class="flex items-center gap-3 px-3 py-2 text-[13px]">
+					<div class="flex items-center gap-3 px-3 py-2 text-[0.8125rem]">
 						{#if accessMode === 'selected'}
 							<input type="checkbox" class="size-4 accent-[var(--primary)]" bind:checked={g.read} onchange={() => !g.read && (g.write = false)} aria-label="Can open {c.name}" />
 						{/if}

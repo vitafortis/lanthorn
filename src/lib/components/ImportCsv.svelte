@@ -234,7 +234,7 @@
 	{#if result}
 		<div class="flex flex-col items-center gap-2 py-8 text-center">
 			<CircleCheck class="size-8 text-success" />
-			<p class="text-[15px] font-semibold">Imported {int(result.rows)} row{result.rows === 1 ? '' : 's'} into {schema}.{result.table}</p>
+			<p class="text-[0.9375rem] font-semibold">Imported {int(result.rows)} row{result.rows === 1 ? '' : 's'} into {schema}.{result.table}</p>
 			<p class="text-xs text-muted-foreground">
 				{#if result.created}Created the table. {/if}{#if result.deleted}Deleted {int(result.deleted)} existing rows first. {/if}The database reported {int(result.affected)} affected rows.
 			</p>
@@ -289,22 +289,22 @@
 				{/if}
 
 				<div class="overflow-x-auto rounded-lg border border-border">
-					<table class="w-full font-mono text-[11px]">
+					<table class="w-full font-mono text-[0.6875rem]">
 						<thead class="bg-surface">
 							<tr class="border-b border-border text-left">
 								{#each headers as h, i (i)}
 									<th class="min-w-36 px-2 py-1.5 align-top font-normal">
-										<div class="truncate font-sans text-[12px] font-semibold" title={h}>{h}</div>
+										<div class="truncate font-sans text-xs font-semibold" title={h}>{h}</div>
 										{#if mode === 'existing'}
-											<select class="input mt-1 h-7 py-0 font-mono text-[11px] {mapping[i] ? '' : 'text-muted-foreground'}" bind:value={mapping[i]}>
+											<select class="input mt-1 h-7 py-0 font-mono text-[0.6875rem] {mapping[i] ? '' : 'text-muted-foreground'}" bind:value={mapping[i]}>
 												<option value={null}>— ignore —</option>
 												{#each targets as t (t.name)}<option value={t.name}>{t.name}</option>{/each}
 											</select>
 										{:else if newCols[i]}
 											<div class="mt-1 space-y-1">
-												<input class="input h-7 font-mono text-[11px] {newCols[i].include ? '' : 'opacity-50'}" bind:value={newCols[i].name} disabled={!newCols[i].include} />
-												<input class="input h-7 font-mono text-[11px] {newCols[i].include ? '' : 'opacity-50'}" bind:value={newCols[i].type} disabled={!newCols[i].include} />
-												<div class="flex items-center gap-2 font-sans text-[11px] text-muted-foreground">
+												<input class="input h-7 font-mono text-[0.6875rem] {newCols[i].include ? '' : 'opacity-50'}" bind:value={newCols[i].name} disabled={!newCols[i].include} />
+												<input class="input h-7 font-mono text-[0.6875rem] {newCols[i].include ? '' : 'opacity-50'}" bind:value={newCols[i].type} disabled={!newCols[i].include} />
+												<div class="flex items-center gap-2 font-sans text-[0.6875rem] text-muted-foreground">
 													<label class="flex items-center gap-1"><input type="checkbox" bind:checked={newCols[i].include} />Import</label>
 													<label class="flex items-center gap-1"><input type="checkbox" bind:checked={newCols[i].pk} disabled={!newCols[i].include} /><KeyRound class="size-3" />Key</label>
 												</div>
@@ -328,7 +328,7 @@
 						</tbody>
 					</table>
 				</div>
-				<p class="text-[11px] text-muted-foreground">Showing the first {Math.min(PREVIEW, sample.length)} rows.</p>
+				<p class="text-[0.6875rem] text-muted-foreground">Showing the first {Math.min(PREVIEW, sample.length)} rows.</p>
 
 				{#if mode === 'existing'}
 					<div class="flex flex-wrap items-start gap-x-6 gap-y-3 text-xs">

@@ -110,7 +110,7 @@
 				<a href="/" class="flex items-center gap-2.5">
 					<Logo size={26} />
 					{#if !collapsed}
-						<span class="text-[15px] font-semibold tracking-tight">pg<span class="text-primary">·</span>modern</span>
+						<span class="text-[0.9375rem] font-semibold tracking-tight">pg<span class="text-primary">·</span>modern</span>
 					{/if}
 				</a>
 			</div>
@@ -121,21 +121,21 @@
 					<a
 						href={item.href}
 						title={item.label}
-						class="relative flex h-8 items-center gap-2.5 rounded-lg px-2.5 text-[13px] font-medium transition-colors {active
+						class="relative flex h-8 items-center gap-2.5 rounded-lg px-2.5 text-[0.8125rem] font-medium transition-colors {active
 							? 'bg-accent text-foreground shadow-surface'
 							: 'text-muted-foreground hover:bg-accent/70 hover:text-foreground'}"
 					>
 						{#if active}<span class="absolute top-1.5 bottom-1.5 left-0 w-0.5 rounded-full bg-primary"></span>{/if}
 						<item.icon class="size-4 shrink-0" />
 						{#if !collapsed}{item.label}{/if}
-						{#if item.href === '/alerts' && firing && !collapsed}<span class="ml-auto rounded-full bg-danger/15 px-1.5 text-[10px] font-semibold text-danger tabular-nums">{firing}</span>{/if}
+						{#if item.href === '/alerts' && firing && !collapsed}<span class="ml-auto rounded-full bg-danger/15 px-1.5 text-[0.625rem] font-semibold text-danger tabular-nums">{firing}</span>{/if}
 					</a>
 				{/each}
 			</nav>
 
 			<div class="mt-5 flex items-center justify-between px-4 pb-1.5">
 				{#if !collapsed}
-					<span class="text-[11px] font-semibold tracking-wider text-muted-foreground/80 uppercase">Connections</span>
+					<span class="text-[0.6875rem] font-semibold tracking-wider text-muted-foreground/80 uppercase">Connections</span>
 				{/if}
 				{#if isAdmin()}
 					<button class="btn btn-ghost btn-icon btn-sm -mr-1.5" title="New connection" onclick={() => (editor.target = 'new')}>
@@ -155,7 +155,7 @@
 				{#each filtered as c (c.id)}
 					{@const active = page.url.pathname.startsWith(`/c/${c.id}`)}
 					<div
-						class="group relative flex h-8 items-center rounded-lg text-[13px] transition-colors {active
+						class="group relative flex h-8 items-center rounded-lg text-[0.8125rem] transition-colors {active
 							? 'bg-accent text-foreground'
 							: 'text-muted-foreground hover:bg-accent/70 hover:text-foreground'}"
 					>
@@ -204,12 +204,12 @@
 
 			{#if data.viewer && data.auth === 'authenticated' && !collapsed}
 				<a href="/account" title="My account" class="flex items-center gap-2.5 border-t border-border px-3 py-2.5 transition-colors hover:bg-accent/60">
-					<span class="grid size-7 shrink-0 place-items-center rounded-full bg-primary-soft text-[11px] font-semibold text-primary uppercase">
+					<span class="grid size-7 shrink-0 place-items-center rounded-full bg-primary-soft text-[0.6875rem] font-semibold text-primary uppercase">
 						{(data.viewer.name ?? data.viewer.email).slice(0, 1)}
 					</span>
 					<div class="min-w-0 flex-1">
-						<p class="truncate text-[12px] font-medium">{data.viewer.name ?? data.viewer.email}</p>
-						<p class="truncate text-[11px] text-muted-foreground capitalize">{data.viewer.role}</p>
+						<p class="truncate text-xs font-medium">{data.viewer.name ?? data.viewer.email}</p>
+						<p class="truncate text-[0.6875rem] text-muted-foreground capitalize">{data.viewer.role}</p>
 					</div>
 				</a>
 			{/if}
@@ -225,7 +225,7 @@
 					{#if theme.value === 'dark'}<Sun />{:else}<Moon />{/if}
 				</button>
 				{#if !collapsed}
-					<span class="ml-1 truncate font-mono text-[11px] text-muted-foreground/70" title="pg·modern version">v{data.version}</span>
+					<span class="ml-1 truncate font-mono text-[0.6875rem] text-muted-foreground/70" title="pg·modern version">v{data.version}</span>
 				{/if}
 				{#if data.auth === 'authenticated'}
 					<button class="btn btn-ghost btn-icon btn-sm {collapsed ? '' : 'ml-auto'}" title="Sign out" onclick={logout}><LogOut /></button>

@@ -243,16 +243,16 @@
 						<button class="flex w-full items-start gap-2.5 rounded-lg px-2.5 py-2 text-left hover:bg-accent" role="menuitem" onclick={() => editor.explainCurrent(false)}>
 							<Workflow class="mt-0.5 size-4 shrink-0 text-muted-foreground" />
 							<span class="min-w-0 flex-1">
-								<span class="block text-[13px] font-medium">Explain</span>
-								<span class="block text-[11px] text-muted-foreground">{sqlite ? 'EXPLAIN QUERY PLAN.' : mysql ? 'The optimizer’s plan.' : 'The planner’s estimates.'} Doesn’t run the query.</span>
+								<span class="block text-[0.8125rem] font-medium">Explain</span>
+								<span class="block text-[0.6875rem] text-muted-foreground">{sqlite ? 'EXPLAIN QUERY PLAN.' : mysql ? 'The optimizer’s plan.' : 'The planner’s estimates.'} Doesn’t run the query.</span>
 							</span>
 						</button>
 						{#if !sqlite}
 						<button class="flex w-full items-start gap-2.5 rounded-lg px-2.5 py-2 text-left hover:bg-accent" role="menuitem" onclick={() => editor.explainCurrent(true)}>
 							<Gauge class="mt-0.5 size-4 shrink-0 text-muted-foreground" />
 							<span class="min-w-0 flex-1">
-								<span class="flex items-center justify-between text-[13px] font-medium">Explain analyze <span class="kbd">⌥⌘↵</span></span>
-								<span class="block text-[11px] text-muted-foreground">
+								<span class="flex items-center justify-between text-[0.8125rem] font-medium">Explain analyze <span class="kbd">⌥⌘↵</span></span>
+								<span class="block text-[0.6875rem] text-muted-foreground">
 									{#if mysql}
 										Runs the query for real timings ({flavor === 'mariadb' ? 'ANALYZE FORMAT=JSON' : 'EXPLAIN ANALYZE, MySQL 8.0.18+'}). Reads only.
 									{:else}
@@ -262,7 +262,7 @@
 							</span>
 						</button>
 						{:else}
-							<p class="px-2.5 py-2 text-[11px] text-muted-foreground">SQLite has no EXPLAIN ANALYZE; the plan shows which tables are scanned and which indexes are used.</p>
+							<p class="px-2.5 py-2 text-[0.6875rem] text-muted-foreground">SQLite has no EXPLAIN ANALYZE; the plan shows which tables are scanned and which indexes are used.</p>
 						{/if}
 					</div>
 				{/if}
@@ -297,7 +297,7 @@
 							{#if outcome && outcome.results.length > 1}
 								{#each outcome.results as r, i (i)}
 									<button
-										class="rounded-t-md border-x border-t px-2.5 py-1 text-[11px] whitespace-nowrap {view === 'results' && active === i
+										class="rounded-t-md border-x border-t px-2.5 py-1 text-[0.6875rem] whitespace-nowrap {view === 'results' && active === i
 											? 'border-border bg-card text-foreground'
 											: 'border-transparent text-muted-foreground hover:text-foreground'}"
 										onclick={() => ((active = i), (selected = null), (view = 'results'))}
@@ -307,7 +307,7 @@
 								{/each}
 							{:else if outcome}
 								<button
-									class="rounded-t-md border-x border-t px-2.5 py-1 text-[11px] whitespace-nowrap {view === 'results'
+									class="rounded-t-md border-x border-t px-2.5 py-1 text-[0.6875rem] whitespace-nowrap {view === 'results'
 										? 'border-border bg-card text-foreground'
 										: 'border-transparent text-muted-foreground hover:text-foreground'}"
 									onclick={() => (view = 'results')}
@@ -317,7 +317,7 @@
 							{/if}
 							{#if planResult || planError}
 								<button
-									class="flex items-center gap-1 rounded-t-md border-x border-t px-2.5 py-1 text-[11px] whitespace-nowrap {view === 'plan'
+									class="flex items-center gap-1 rounded-t-md border-x border-t px-2.5 py-1 text-[0.6875rem] whitespace-nowrap {view === 'plan'
 										? 'border-border bg-card text-foreground'
 										: 'border-transparent text-muted-foreground hover:text-foreground'}"
 									onclick={() => (view = 'plan')}
@@ -331,11 +331,11 @@
 					{#if view === 'plan' && (planResult || planError)}
 						{#if planResult?.format === 'text'}
 							<div class="min-h-0 flex-1 overflow-auto">
-								<div class="flex items-center gap-2 border-b border-border px-3 py-1.5 text-[11px] text-muted-foreground">
+								<div class="flex items-center gap-2 border-b border-border px-3 py-1.5 text-[0.6875rem] text-muted-foreground">
 									<Workflow class="size-3.5" />{planResult.analyzed ? 'Measured plan' : 'Estimated plan'}
 									<span class="flex items-center gap-1"><Lock class="size-3" />read-only</span>
 								</div>
-								<pre class="p-4 font-mono text-[12px] leading-relaxed whitespace-pre">{String(planResult.plan)}</pre>
+								<pre class="p-4 font-mono text-xs leading-relaxed whitespace-pre">{String(planResult.plan)}</pre>
 							</div>
 						{:else if planResult}
 							<div class="min-h-0 flex-1"><PlanView plan={planResult.plan} executedWrite={planResult.executedWrite} readOnly={planResult.readOnly} /></div>
@@ -354,12 +354,12 @@
 									<CellInspector bind:cell={selected} />
 								</div>
 							{:else if !outcome.error}
-								<div class="m-3 flex items-center gap-2.5 rounded-xl border border-success/30 bg-success/5 p-4 text-[13px]">
+								<div class="m-3 flex items-center gap-2.5 rounded-xl border border-success/30 bg-success/5 p-4 text-[0.8125rem]">
 									<CircleCheck class="size-4 text-success" />
 									<span><b class="font-medium">{result.command}</b>{#if result.rowCount != null} · {int(result.rowCount)} row{result.rowCount === 1 ? '' : 's'} affected{/if}</span>
 								</div>
 							{/if}
-							<div class="mt-auto flex items-center gap-3 border-t border-border bg-surface px-3 py-1.5 text-[11px] text-muted-foreground">
+							<div class="mt-auto flex items-center gap-3 border-t border-border bg-surface px-3 py-1.5 text-[0.6875rem] text-muted-foreground">
 								<span class="font-medium text-foreground">{result.command}</span>
 								<span class="tabular-nums">{int(result.rows.length)} row{result.rows.length === 1 ? '' : 's'}</span>
 								<span class="tabular-nums">{duration(result.durationMs)}</span>
@@ -398,7 +398,7 @@
 		{#if panel === 'saved'}
 			<aside class="flex w-80 shrink-0 flex-col border-l border-border bg-surface">
 				<div class="flex items-center justify-between border-b border-border px-3 py-2">
-					<span class="text-[13px] font-semibold">Saved queries</span>
+					<span class="text-[0.8125rem] font-semibold">Saved queries</span>
 					<button class="btn btn-ghost btn-sm" title="Save the editor's query (⌘S)" onclick={openSave}><Save />Save</button>
 				</div>
 				<div class="min-h-0 flex-1">
@@ -414,14 +414,14 @@
 		{#if panel === 'history'}
 			<aside class="flex w-80 shrink-0 flex-col border-l border-border bg-surface">
 				<div class="flex items-center justify-between border-b border-border px-3 py-2">
-					<span class="text-[13px] font-semibold">History</span>
+					<span class="text-[0.8125rem] font-semibold">History</span>
 					<button class="btn btn-ghost btn-icon btn-sm" title="Clear history" onclick={clearHistory}><Trash2 /></button>
 				</div>
 				<div class="min-h-0 flex-1 divide-y divide-border overflow-y-auto">
 					{#each history as h (h.id)}
 						<button class="block w-full px-3 py-2 text-left hover:bg-accent/50" onclick={() => (sql = h.sql)}>
-							<pre class="line-clamp-3 font-mono text-[11px] whitespace-pre-wrap {h.ok ? '' : 'text-danger'}">{h.sql}</pre>
-							<p class="mt-1 text-[10px] text-muted-foreground">
+							<pre class="line-clamp-3 font-mono text-[0.6875rem] whitespace-pre-wrap {h.ok ? '' : 'text-danger'}">{h.sql}</pre>
+							<p class="mt-1 text-[0.625rem] text-muted-foreground">
 								{#if h.userEmail && h.userEmail !== session.viewer?.email}<span class="text-foreground/80">{h.userEmail}</span> · {/if}{#if !h.readOnly}<span class="text-warning">write</span> · {/if}{ago(h.createdAt)} · {duration(h.durationMs)}{#if h.rowCount != null} · {h.rowCount} rows{/if}
 							</p>
 						</button>
@@ -440,14 +440,14 @@
 		<div class="flex items-start gap-2.5">
 			<CircleAlert class="mt-0.5 size-4 shrink-0 text-danger" />
 			<div class="min-w-0 flex-1">
-				<p class="text-[13px] font-medium">{e.message}</p>
-				<p class="mt-1 font-mono text-[11px] text-muted-foreground">
+				<p class="text-[0.8125rem] font-medium">{e.message}</p>
+				<p class="mt-1 font-mono text-[0.6875rem] text-muted-foreground">
 					{[e.sqlState ? `SQLSTATE ${e.sqlState}` : e.code && `SQLSTATE ${e.code}`, e.sqlState && e.code, showStatement && `statement ${e.statementIndex + 1}`, loc && `line ${loc.line}, col ${loc.col}`]
 						.filter(Boolean)
 						.join(' · ')}
 				</p>
 				{#if loc}
-					<pre class="mt-2 overflow-x-auto rounded-md bg-background/60 p-2 font-mono text-[11px]">{loc.text}
+					<pre class="mt-2 overflow-x-auto rounded-md bg-background/60 p-2 font-mono text-[0.6875rem]">{loc.text}
 {' '.repeat(Math.max(0, loc.col - 1))}<span class="text-danger">^</span></pre>
 				{/if}
 				{#if e.detail}<p class="mt-2 text-xs text-muted-foreground"><b class="font-medium text-foreground">Detail:</b> {e.detail}</p>{/if}

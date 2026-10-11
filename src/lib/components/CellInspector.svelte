@@ -28,14 +28,14 @@
 	<aside class="flex w-80 shrink-0 flex-col border-l border-border bg-surface">
 		<div class="flex items-center gap-2 border-b border-border px-3 py-2">
 			<div class="min-w-0 flex-1">
-				<p class="truncate text-[13px] font-semibold">{cell.field.name}</p>
-				<p class="font-mono text-[10px] text-muted-foreground">{cell.field.type} · row {cell.row + 1}</p>
+				<p class="truncate text-[0.8125rem] font-semibold">{cell.field.name}</p>
+				<p class="font-mono text-[0.625rem] text-muted-foreground">{cell.field.type} · row {cell.row + 1}</p>
 			</div>
 			<button class="btn btn-ghost btn-icon btn-sm" title="Copy value" onclick={copy}><Copy /></button>
 			<button class="btn btn-ghost btn-icon btn-sm" title="Close" onclick={() => (cell = null)}><X /></button>
 		</div>
-		<pre class="min-h-0 flex-1 overflow-auto p-3 font-mono text-[12px] leading-relaxed break-all whitespace-pre-wrap {cell.value === null ? 'text-muted-foreground italic' : ''}">{pretty}</pre>
-		<p class="border-t border-border px-3 py-1.5 text-[10px] text-muted-foreground">
+		<pre class="min-h-0 flex-1 overflow-auto p-3 font-mono text-xs leading-relaxed break-all whitespace-pre-wrap {cell.value === null ? 'text-muted-foreground italic' : ''}">{pretty}</pre>
+		<p class="border-t border-border px-3 py-1.5 text-[0.625rem] text-muted-foreground">
 			{pretty.length.toLocaleString()} chars · <span class="kbd">↑↓←→</span> move · <span class="kbd">⌘C</span> copy
 		</p>
 	</aside>

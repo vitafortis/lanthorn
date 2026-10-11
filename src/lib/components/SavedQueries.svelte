@@ -55,7 +55,7 @@
 	<div class="min-h-0 flex-1 overflow-y-auto">
 		{#each groups as g (g.title)}
 			{#if g.items.length}
-				<p class="sticky top-0 z-10 border-b border-border bg-surface/95 px-3 py-1.5 text-[10px] font-semibold tracking-wider text-muted-foreground uppercase backdrop-blur">
+				<p class="sticky top-0 z-10 border-b border-border bg-surface/95 px-3 py-1.5 text-[0.625rem] font-semibold tracking-wider text-muted-foreground uppercase backdrop-blur">
 					{g.title} <span class="font-normal opacity-70">{g.items.length}</span>
 				</p>
 				<div class="divide-y divide-border">
@@ -64,13 +64,13 @@
 							{#if q.id === activeId}<span class="absolute inset-y-0 left-0 w-0.5 bg-primary"></span>{/if}
 							<button class="block w-full text-left" onclick={() => onload(q)} title="Open in the editor">
 								<span class="flex items-center gap-1.5 pr-16">
-									<span class="truncate text-[12.5px] font-medium">{q.name}</span>
+									<span class="truncate text-[0.78125rem] font-medium">{q.name}</span>
 									{#if q.mine && q.shared}<Users class="size-3 shrink-0 text-primary" aria-label="Shared" />{/if}
 									{#if !q.connectionId}<Globe class="size-3 shrink-0 text-muted-foreground" aria-label="Any connection" />{/if}
 								</span>
-								{#if q.description}<span class="mt-0.5 line-clamp-2 block text-[11px] text-muted-foreground">{q.description}</span>{/if}
-								<pre class="mt-1 line-clamp-2 font-mono text-[10.5px] whitespace-pre-wrap text-muted-foreground/80">{q.sql}</pre>
-								<span class="mt-1 block text-[10px] text-muted-foreground">
+								{#if q.description}<span class="mt-0.5 line-clamp-2 block text-[0.6875rem] text-muted-foreground">{q.description}</span>{/if}
+								<pre class="mt-1 line-clamp-2 font-mono text-[0.65625rem] whitespace-pre-wrap text-muted-foreground/80">{q.sql}</pre>
+								<span class="mt-1 block text-[0.625rem] text-muted-foreground">
 									{#if !q.mine}<span class="text-foreground/80">{q.ownerEmail}</span> · {/if}{ago(q.updatedAt)}
 								</span>
 							</button>

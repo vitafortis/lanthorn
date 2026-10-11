@@ -222,7 +222,7 @@
 <svelte:document onvisibilitychange={() => (visible = document.visibilityState !== 'hidden')} />
 
 {#snippet sectionError(message: string)}
-	<p class="flex items-start gap-2 rounded-lg bg-danger/5 p-2.5 font-mono text-[11px] text-danger"><TriangleAlert class="mt-px size-3.5 shrink-0" />{message}</p>
+	<p class="flex items-start gap-2 rounded-lg bg-danger/5 p-2.5 font-mono text-[0.6875rem] text-danger"><TriangleAlert class="mt-px size-3.5 shrink-0" />{message}</p>
 {/snippet}
 
 {#snippet stat(Icon: typeof Clock, label: string, value: string, sub: string, tone: '' | 'success' | 'warning' | 'danger')}
@@ -231,25 +231,25 @@
 			<Icon class="size-3.5 {tone === 'success' ? 'text-success' : tone === 'warning' ? 'text-warning' : tone === 'danger' ? 'text-danger' : 'text-primary'}" />{label}
 		</div>
 		<p class="mt-1.5 text-xl font-semibold tracking-tight tabular-nums {tone === 'warning' ? 'text-warning' : tone === 'danger' ? 'text-danger' : ''}">{value}</p>
-		<p class="mt-0.5 truncate text-[11px] text-muted-foreground">{sub}</p>
+		<p class="mt-0.5 truncate text-[0.6875rem] text-muted-foreground">{sub}</p>
 	</div>
 {/snippet}
 
 <div class="h-full overflow-y-auto">
 	<div class="sticky top-0 z-10 flex flex-wrap items-center gap-2 border-b border-border bg-background/85 px-5 py-2 backdrop-blur">
-		<h2 class="flex items-center gap-2 text-[13px] font-semibold"><ActivityIcon class="size-4 text-primary" />Activity</h2>
-		{#if server}<span class="font-mono text-[11px] text-muted-foreground">{server.currentUser}{server.superuser ? (mysql ? ' · admin' : ' · superuser') : ''}</span>{/if}
+		<h2 class="flex items-center gap-2 text-[0.8125rem] font-semibold"><ActivityIcon class="size-4 text-primary" />Activity</h2>
+		{#if server}<span class="font-mono text-[0.6875rem] text-muted-foreground">{server.currentUser}{server.superuser ? (mysql ? ' · admin' : ' · superuser') : ''}</span>{/if}
 		<div class="ml-auto flex items-center gap-2">
 			{#if error && data}
 				<span class="badge badge-danger" title={error}><TriangleAlert />Refresh failed</span>
 			{/if}
-			<span class="text-[11px] text-muted-foreground tabular-nums">
+			<span class="text-[0.6875rem] text-muted-foreground tabular-nums">
 				{#if !fetchedAt}Loading…{:else if !live}Paused · updated {formatAge(elapsed)} ago{:else}Updated {elapsed < 1 ? 'just now' : `${formatAge(elapsed)} ago`}{/if}
 			</span>
 			<div class="inline-flex rounded-lg border border-border bg-surface p-0.5" role="group" aria-label="Auto-refresh">
 				{#each [0, 2, 5, 15] as s (s)}
 					<button
-						class="h-6 rounded-md px-2 text-[11px] {every === s ? 'bg-card text-foreground shadow-surface' : 'text-muted-foreground hover:text-foreground'}"
+						class="h-6 rounded-md px-2 text-[0.6875rem] {every === s ? 'bg-card text-foreground shadow-surface' : 'text-muted-foreground hover:text-foreground'}"
 						aria-pressed={every === s}
 						title={s ? `Refresh every ${s} seconds` : 'Don’t refresh automatically'}
 						onclick={() => (every = s)}>{s ? `${s}s` : 'Off'}</button
@@ -264,7 +264,7 @@
 
 	{#if !data && error}
 		<div class="m-5 rounded-xl border border-danger/30 bg-danger/5 p-4">
-			<p class="text-[13px] font-medium">Could not load activity</p>
+			<p class="text-[0.8125rem] font-medium">Could not load activity</p>
 			<p class="mt-1 font-mono text-xs text-muted-foreground">{error}</p>
 			<button class="btn btn-secondary btn-sm mt-3" onclick={load}><RefreshCw />Try again</button>
 		</div>
@@ -296,7 +296,7 @@
 			</div>
 
 			{#if summary.longTransactions.length}
-				<div class="flex flex-wrap items-center gap-2 rounded-xl border border-warning/30 bg-warning/5 px-3.5 py-2.5 text-[12px]">
+				<div class="flex flex-wrap items-center gap-2 rounded-xl border border-warning/30 bg-warning/5 px-3.5 py-2.5 text-xs">
 					<TriangleAlert class="size-4 text-warning" />
 					<span>
 						{summary.longTransactions.length === 1 ? 'A transaction has' : `${summary.longTransactions.length} transactions have`} been open longer than {LONG_TXN_SECONDS / 60} minutes. Long transactions hold back {mysql ? 'InnoDB purge' : 'vacuum'} and can block DDL.
@@ -309,12 +309,12 @@
 
 			<section class="card overflow-hidden">
 				<div class="flex flex-wrap items-center gap-2 border-b border-border px-4 py-2.5">
-					<h3 class="mr-1 text-[13px] font-semibold">Sessions</h3>
-					<span class="text-[11px] text-muted-foreground tabular-nums">{filtered.length} shown{hiddenCount ? ` · ${hiddenCount} hidden` : ''}</span>
+					<h3 class="mr-1 text-[0.8125rem] font-semibold">Sessions</h3>
+					<span class="text-[0.6875rem] text-muted-foreground tabular-nums">{filtered.length} shown{hiddenCount ? ` · ${hiddenCount} hidden` : ''}</span>
 					<div class="ml-auto flex flex-wrap items-center gap-1.5">
 						{#each [{ label: 'Idle', get: () => hideIdle, set: (v: boolean) => (hideIdle = v) }, { label: 'Background', get: () => hideBackground, set: (v: boolean) => (hideBackground = v) }, { label: 'pg·modern', get: () => hideOwn, set: (v: boolean) => (hideOwn = v) }] as f (f.label)}
 							<button
-								class="h-7 rounded-lg border px-2.5 text-[11px] transition-colors {f.get()
+								class="h-7 rounded-lg border px-2.5 text-[0.6875rem] transition-colors {f.get()
 									? 'border-border text-muted-foreground line-through decoration-muted-foreground/50 hover:text-foreground'
 									: 'border-primary/30 bg-primary-soft text-primary'}"
 								aria-pressed={!f.get()}
@@ -333,19 +333,19 @@
 					<div class="p-4">{@render sectionError(data.sessions.error)}</div>
 				{:else}
 					{#if privilegeHidden && mysql}
-						<p class="border-b border-border bg-surface/60 px-4 py-2 text-[11px] text-muted-foreground">
+						<p class="border-b border-border bg-surface/60 px-4 py-2 text-[0.6875rem] text-muted-foreground">
 							Without the <code class="font-mono">PROCESS</code> privilege this account only sees its own threads. Grant
 							<code class="font-mono">PROCESS</code> to see every connection and InnoDB lock waits.
 						</p>
 					{:else if privilegeHidden}
-						<p class="border-b border-border bg-surface/60 px-4 py-2 text-[11px] text-muted-foreground">
+						<p class="border-b border-border bg-surface/60 px-4 py-2 text-[0.6875rem] text-muted-foreground">
 							Some queries show as <code class="font-mono">&lt;insufficient privilege&gt;</code>: this role can only see its own sessions’ details. Grant
 							<code class="font-mono">pg_read_all_stats</code> to see everything.
 						</p>
 					{/if}
 					<div class="overflow-x-auto">
-						<table class="w-full min-w-[960px] text-left text-[12px]">
-							<thead class="border-b border-border text-[11px] text-muted-foreground">
+						<table class="w-full min-w-[960px] text-left text-xs">
+							<thead class="border-b border-border text-[0.6875rem] text-muted-foreground">
 								<tr>
 									<th class="w-28 px-4 py-2 font-medium">{mysql ? 'ID' : 'PID'}</th>
 									<th class="w-36 px-2 py-2 font-medium">State</th>
@@ -382,27 +382,27 @@
 										<td class="px-2 py-2">
 											<span class="badge {TONE[tone].cls}">{TONE[tone].label(s)}</span>
 											{#if s.waitEvent}
-												<p class="mt-1 truncate font-mono text-[10.5px] text-muted-foreground" title="{s.waitEventType}: {s.waitEvent}">{s.waitEventType} · {s.waitEvent}</p>
+												<p class="mt-1 truncate font-mono text-[0.65625rem] text-muted-foreground" title="{s.waitEventType}: {s.waitEvent}">{s.waitEventType} · {s.waitEvent}</p>
 											{/if}
 										</td>
 										<td class="max-w-44 px-2 py-2">
-											<p class="truncate font-mono text-[11.5px]" title="{s.user ?? ''}@{s.database ?? ''}">
+											<p class="truncate font-mono text-[0.71875rem]" title="{s.user ?? ''}@{s.database ?? ''}">
 												{s.user ?? '—'}{#if s.database}<span class="text-muted-foreground">@{s.database}</span>{/if}
 											</p>
-											<p class="truncate text-[11px] text-muted-foreground" title={s.app ?? ''}>{s.app ?? (s.backendType !== 'client backend' ? (s.backendType ?? '') : '')}</p>
+											<p class="truncate text-[0.6875rem] text-muted-foreground" title={s.app ?? ''}>{s.app ?? (s.backendType !== 'client backend' ? (s.backendType ?? '') : '')}</p>
 										</td>
-										<td class="max-w-32 truncate px-2 py-2 font-mono text-[11px] text-muted-foreground" title={s.client ?? ''}>{s.client ?? '—'}</td>
+										<td class="max-w-32 truncate px-2 py-2 font-mono text-[0.6875rem] text-muted-foreground" title={s.client ?? ''}>{s.client ?? '—'}</td>
 										<td class="px-2 py-2 text-right tabular-nums">
 											<span class={tone === 'idle' || tone === 'background' ? 'text-muted-foreground' : (secs ?? 0) >= LONG_TXN_SECONDS ? 'font-medium text-warning' : 'font-medium'}>{formatAge(secs)}</span>
 											{#if s.xactSeconds != null && (secs ?? 0) + 1 < (tick(s.xactSeconds) ?? 0)}
-												<p class="text-[10.5px] text-muted-foreground" title="Transaction open for">txn {formatAge(tick(s.xactSeconds))}</p>
+												<p class="text-[0.65625rem] text-muted-foreground" title="Transaction open for">txn {formatAge(tick(s.xactSeconds))}</p>
 											{/if}
 										</td>
 										<td class="max-w-0 px-3 py-2">
 											{#if s.query}
 												<button class="group flex w-full min-w-0 items-start gap-1 text-left" onclick={() => toggle(s.pid)} aria-expanded={open}>
 													<ChevronRight class="mt-0.5 size-3 shrink-0 text-muted-foreground transition-transform {open ? 'rotate-90' : ''}" />
-													<code class="block min-w-0 truncate font-mono text-[11.5px] {tone === 'idle' ? 'text-muted-foreground' : ''} group-hover:text-foreground">{oneLine(s.query)}</code>
+													<code class="block min-w-0 truncate font-mono text-[0.71875rem] {tone === 'idle' ? 'text-muted-foreground' : ''} group-hover:text-foreground">{oneLine(s.query)}</code>
 												</button>
 											{:else}
 												<span class="text-muted-foreground/60">—</span>
@@ -435,8 +435,8 @@
 										<tr class="border-b border-border/60 bg-surface/50">
 											<td></td>
 											<td colspan="6" class="px-2 pt-1 pb-3">
-												<pre class="max-h-72 overflow-auto rounded-lg border border-border bg-background p-3 font-mono text-[11.5px] leading-relaxed whitespace-pre-wrap">{s.query}{s.queryTruncated ? '\n…(truncated)' : ''}</pre>
-												<dl class="mt-2 flex flex-wrap gap-x-5 gap-y-1 text-[11px] text-muted-foreground">
+												<pre class="max-h-72 overflow-auto rounded-lg border border-border bg-background p-3 font-mono text-[0.71875rem] leading-relaxed whitespace-pre-wrap">{s.query}{s.queryTruncated ? '\n…(truncated)' : ''}</pre>
+												<dl class="mt-2 flex flex-wrap gap-x-5 gap-y-1 text-[0.6875rem] text-muted-foreground">
 													{#if mysql}
 														{#if s.waitEvent}<div><dt class="inline">State</dt> <dd class="inline font-mono text-foreground">{s.waitEvent}</dd></div>{/if}
 														{#if s.client}<div><dt class="inline">Host</dt> <dd class="inline font-mono text-foreground">{s.client}</dd></div>{/if}
@@ -464,7 +464,7 @@
 			<div class="grid gap-5 xl:grid-cols-[1fr_1.5fr]">
 				<div class="space-y-5">
 					<section class="card p-4">
-						<h3 class="mb-3 flex items-center gap-2 text-[13px] font-semibold">
+						<h3 class="mb-3 flex items-center gap-2 text-[0.8125rem] font-semibold">
 							<Lock class="size-4 text-primary" />Locks
 							{#if waitingLocks.length}<span class="badge badge-danger">{waitingLocks.length} waiting</span>{/if}
 						</h3>
@@ -475,12 +475,12 @@
 						{:else}
 							<div class="space-y-1">
 								{#each [...waitingLocks, ...heldLocks] as l, i (i)}
-									<div class="flex items-center gap-2 rounded-md px-2 py-1.5 text-[12px] {l.granted ? '' : 'bg-danger/5'}">
+									<div class="flex items-center gap-2 rounded-md px-2 py-1.5 text-xs {l.granted ? '' : 'bg-danger/5'}">
 										<span class="badge {l.granted ? 'badge-warning' : 'badge-danger'}">{l.granted ? 'held' : 'waiting'}</span>
-										<button class="font-mono text-[11px] tabular-nums hover:text-primary" title="Show this session" onclick={() => (search = String(l.pid))}>{l.pid}</button>
-										<span class="truncate font-mono text-[11px]" title={l.relation ?? l.locktype}>{l.relation ?? (l.locktype === 'transactionid' ? 'transaction' : l.locktype)}</span>
-										<span class="ml-auto shrink-0 text-[11px] text-muted-foreground">{l.mode.replace(/Lock$/, '')}</span>
-										<span class="w-14 shrink-0 text-right text-[11px] text-muted-foreground tabular-nums">{formatAge(tick(l.seconds))}</span>
+										<button class="font-mono text-[0.6875rem] tabular-nums hover:text-primary" title="Show this session" onclick={() => (search = String(l.pid))}>{l.pid}</button>
+										<span class="truncate font-mono text-[0.6875rem]" title={l.relation ?? l.locktype}>{l.relation ?? (l.locktype === 'transactionid' ? 'transaction' : l.locktype)}</span>
+										<span class="ml-auto shrink-0 text-[0.6875rem] text-muted-foreground">{l.mode.replace(/Lock$/, '')}</span>
+										<span class="w-14 shrink-0 text-right text-[0.6875rem] text-muted-foreground tabular-nums">{formatAge(tick(l.seconds))}</span>
 									</div>
 								{/each}
 							</div>
@@ -488,7 +488,7 @@
 					</section>
 
 					<section class="card p-4">
-						<h3 class="mb-3 flex items-center gap-2 text-[13px] font-semibold"><Database class="size-4 text-primary" />Databases</h3>
+						<h3 class="mb-3 flex items-center gap-2 text-[0.8125rem] font-semibold"><Database class="size-4 text-primary" />Databases</h3>
 						{#if data.databases.error}
 							{@render sectionError(data.databases.error)}
 						{:else}
@@ -496,11 +496,11 @@
 								{#each data.databases.data ?? [] as d (d.name)}
 									<div class="relative overflow-hidden rounded-md px-2 py-1.5">
 										<div class="absolute inset-y-0 left-0 rounded-md {d.current ? 'bg-primary/20' : 'bg-primary-soft'}" style="width:{((d.bytes ?? 0) / maxDb) * 100}%"></div>
-										<div class="relative flex items-center gap-2 text-[12px]">
+										<div class="relative flex items-center gap-2 text-xs">
 											<span class="truncate font-mono text-xs {d.current ? 'font-medium' : ''}">{d.name}</span>
 											{#if d.current}<span class="badge badge-primary">current</span>{/if}
-											<span class="ml-auto text-[11px] text-muted-foreground tabular-nums">{d.sessions} {d.sessions === 1 ? 'session' : 'sessions'}</span>
-											<span class="w-16 text-right text-[11px] font-medium tabular-nums">{d.bytes == null ? 'no access' : bytes(d.bytes)}</span>
+											<span class="ml-auto text-[0.6875rem] text-muted-foreground tabular-nums">{d.sessions} {d.sessions === 1 ? 'session' : 'sessions'}</span>
+											<span class="w-16 text-right text-[0.6875rem] font-medium tabular-nums">{d.bytes == null ? 'no access' : bytes(d.bytes)}</span>
 										</div>
 									</div>
 								{/each}
@@ -511,15 +511,15 @@
 
 				<div class="space-y-5">
 					<section class="card overflow-hidden">
-						<h3 class="flex items-center gap-2 px-4 pt-4 pb-3 text-[13px] font-semibold"><Table2 class="size-4 text-primary" />Largest tables</h3>
+						<h3 class="flex items-center gap-2 px-4 pt-4 pb-3 text-[0.8125rem] font-semibold"><Table2 class="size-4 text-primary" />Largest tables</h3>
 						{#if data.tables.error}
 							<div class="px-4 pb-4">{@render sectionError(data.tables.error)}</div>
 						{:else if !data.tables.data?.length}
 							<p class="px-4 pb-4 text-xs text-muted-foreground">No user tables in this database.</p>
 						{:else}
 							<div class="overflow-x-auto">
-								<table class="w-full min-w-[560px] text-left text-[12px]">
-									<thead class="border-y border-border text-[11px] text-muted-foreground">
+								<table class="w-full min-w-[560px] text-left text-xs">
+									<thead class="border-y border-border text-[0.6875rem] text-muted-foreground">
 										<tr>
 											<th class="px-4 py-1.5 font-medium">Table</th>
 											<th class="w-36 px-2 py-1.5 font-medium">Size</th>
@@ -540,7 +540,7 @@
 											{@const dead = deadRatio(t.liveTuples, t.deadTuples)}
 											<tr class="border-b border-border/60 last:border-0 hover:bg-accent/40">
 												<td class="max-w-48 px-4 py-1.5">
-													<button class="block max-w-full truncate font-mono text-[11.5px] hover:text-primary" onclick={() => onopen?.(t.schema, t.name)}>
+													<button class="block max-w-full truncate font-mono text-[0.71875rem] hover:text-primary" onclick={() => onopen?.(t.schema, t.name)}>
 														<span class="text-muted-foreground">{t.schema}.</span>{t.name}
 													</button>
 												</td>
@@ -556,9 +556,9 @@
 												</td>
 												<td class="px-2 py-1.5 text-right text-muted-foreground tabular-nums" title={mysql ? 'Estimate from table statistics' : undefined}>{mysql ? '~' : ''}{compact(t.liveTuples)}</td>
 												{#if mysql}
-													<td class="px-2 py-1.5 font-mono text-[11px] text-muted-foreground">{t.storageEngine ?? '—'}</td>
-													<td class="px-2 py-1.5 text-right text-[11px] text-muted-foreground tabular-nums">{bytes(t.freeBytes)}</td>
-													<td class="px-4 py-1.5 text-[11px] whitespace-nowrap text-muted-foreground" title={t.updatedAt ?? 'Not tracked for this table'}>{t.updatedAt ? ago(t.updatedAt.replace(' ', 'T')) : '—'}</td>
+													<td class="px-2 py-1.5 font-mono text-[0.6875rem] text-muted-foreground">{t.storageEngine ?? '—'}</td>
+													<td class="px-2 py-1.5 text-right text-[0.6875rem] text-muted-foreground tabular-nums">{bytes(t.freeBytes)}</td>
+													<td class="px-4 py-1.5 text-[0.6875rem] whitespace-nowrap text-muted-foreground" title={t.updatedAt ?? 'Not tracked for this table'}>{t.updatedAt ? ago(t.updatedAt.replace(' ', 'T')) : '—'}</td>
 												{:else}
 												<td class="px-2 py-1.5 text-right tabular-nums">
 													{#if dead == null}
@@ -569,8 +569,8 @@
 														<span class="text-muted-foreground" title="{compact(t.deadTuples)} dead tuples">{dead < 1 && dead > 0 ? '<1' : dead.toFixed(0)}%</span>
 													{/if}
 												</td>
-												<td class="px-2 py-1.5 text-[11px] whitespace-nowrap text-muted-foreground" title={t.lastVacuum ? `manual vacuum ${ago(t.lastVacuum)}` : ''}>{ago(t.lastAutovacuum)}</td>
-												<td class="px-4 py-1.5 text-right font-mono text-[11px] whitespace-nowrap text-muted-foreground tabular-nums">{t.seqScans == null ? '—' : compact(t.seqScans)} / {t.idxScans == null ? '—' : compact(t.idxScans)}</td>
+												<td class="px-2 py-1.5 text-[0.6875rem] whitespace-nowrap text-muted-foreground" title={t.lastVacuum ? `manual vacuum ${ago(t.lastVacuum)}` : ''}>{ago(t.lastAutovacuum)}</td>
+												<td class="px-4 py-1.5 text-right font-mono text-[0.6875rem] whitespace-nowrap text-muted-foreground tabular-nums">{t.seqScans == null ? '—' : compact(t.seqScans)} / {t.idxScans == null ? '—' : compact(t.idxScans)}</td>
 												{/if}
 											</tr>
 										{/each}
@@ -581,7 +581,7 @@
 					</section>
 
 					<section class="card p-4">
-						<h3 class="mb-3 flex items-center gap-2 text-[13px] font-semibold"><Layers class="size-4 text-primary" />Largest indexes</h3>
+						<h3 class="mb-3 flex items-center gap-2 text-[0.8125rem] font-semibold"><Layers class="size-4 text-primary" />Largest indexes</h3>
 						{#if data.indexes.error}
 							{@render sectionError(data.indexes.error)}
 						{:else if !data.indexes.data?.length}
@@ -589,12 +589,12 @@
 						{:else}
 							<div class="space-y-0.5">
 								{#each data.indexes.data as ix (ix.schema + '.' + ix.table + '.' + ix.name)}
-									<div class="flex items-center gap-2 rounded-md px-2 py-1 text-[12px] hover:bg-accent/40">
-										<span class="truncate font-mono text-[11.5px]" title="{ix.schema}.{ix.table}">{ix.name}</span>
-										<span class="truncate text-[11px] text-muted-foreground">on {ix.table}</span>
+									<div class="flex items-center gap-2 rounded-md px-2 py-1 text-xs hover:bg-accent/40">
+										<span class="truncate font-mono text-[0.71875rem]" title="{ix.schema}.{ix.table}">{ix.name}</span>
+										<span class="truncate text-[0.6875rem] text-muted-foreground">on {ix.table}</span>
 										{#if ix.scans === 0 && !ix.unique}<span class="badge badge-warning" title="Never used since statistics were last reset">unused</span>{/if}
-										{#if ix.scans != null || !mysql}<span class="ml-auto shrink-0 text-[11px] text-muted-foreground tabular-nums">{ix.scans == null ? '—' : compact(ix.scans)} scans</span>{:else}<span class="ml-auto"></span>{/if}
-										<span class="w-16 shrink-0 text-right text-[11px] font-medium tabular-nums">{bytes(ix.bytes)}</span>
+										{#if ix.scans != null || !mysql}<span class="ml-auto shrink-0 text-[0.6875rem] text-muted-foreground tabular-nums">{ix.scans == null ? '—' : compact(ix.scans)} scans</span>{:else}<span class="ml-auto"></span>{/if}
+										<span class="w-16 shrink-0 text-right text-[0.6875rem] font-medium tabular-nums">{bytes(ix.bytes)}</span>
 									</div>
 								{/each}
 							</div>

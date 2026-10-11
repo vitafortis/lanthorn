@@ -97,7 +97,7 @@
 	onclick={(e) => e.stopPropagation()}
 	ondblclick={(e) => e.stopPropagation()}
 	style="left:{-shift}px"
-	class="absolute top-0 z-20 min-w-full rounded-md border border-primary bg-card p-1 font-sans text-[12px] text-foreground no-underline shadow-surface-lg {multiline ? 'w-96' : 'w-max'}"
+	class="absolute top-0 z-20 min-w-full rounded-md border border-primary bg-card p-1 font-sans text-xs text-foreground no-underline shadow-surface-lg {multiline ? 'w-96' : 'w-max'}"
 >
 	{#if column.kind === 'boolean'}
 		<div class="flex items-center gap-1">
@@ -130,7 +130,7 @@
 			/>
 		{/if}
 		<div class="mt-1 flex items-center gap-1">
-			{#if error}<span class="text-[11px] text-danger">{error}</span>{:else}<span class="font-mono text-[10px] text-muted-foreground">{column.type}</span>{/if}
+			{#if error}<span class="text-[0.6875rem] text-danger">{error}</span>{:else}<span class="font-mono text-[0.625rem] text-muted-foreground">{column.type}</span>{/if}
 			<span class="ml-auto"></span>
 			{#if column.nullable}<button class="btn btn-ghost btn-sm italic" onclick={() => onsave(null)}>NULL</button>{/if}
 			{#if isNew}<button class="btn btn-ghost btn-sm italic" onclick={() => onsave(DEFAULT_VALUE)}>DEFAULT</button>{/if}

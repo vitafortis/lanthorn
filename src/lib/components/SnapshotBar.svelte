@@ -26,7 +26,7 @@
 	const takenAt = $derived(snap.takenAt ? new Date(snap.takenAt) : null);
 </script>
 
-<div class="flex shrink-0 items-center gap-3 border-b border-border bg-surface/60 px-4 py-1.5 text-[11px] text-muted-foreground">
+<div class="flex shrink-0 items-center gap-3 border-b border-border bg-surface/60 px-4 py-1.5 text-[0.6875rem] text-muted-foreground">
 	<Camera class="size-3.5 shrink-0 text-primary" />
 	{#if takenAt}
 		<span>

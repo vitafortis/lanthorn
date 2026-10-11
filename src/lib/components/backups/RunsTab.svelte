@@ -76,13 +76,13 @@
 {#if !data.destinations.length}
 	<div class="card px-6 py-12 text-center">
 		<p class="text-sm font-medium">No destinations yet</p>
-		<p class="mt-1 text-[13px] text-muted-foreground">Add a folder, an SFTP server or an S3 bucket to store backups in.</p>
+		<p class="mt-1 text-[0.8125rem] text-muted-foreground">Add a folder, an SFTP server or an S3 bucket to store backups in.</p>
 		<button class="btn btn-primary mt-4" onclick={() => goto('destinations')}>Add a destination</button>
 	</div>
 {:else}
 	<div class="card overflow-hidden">
-		<table class="w-full table-fixed text-left text-[13px]">
-			<thead class="border-b border-border bg-surface text-[11px] text-muted-foreground">
+		<table class="w-full table-fixed text-left text-[0.8125rem]">
+			<thead class="border-b border-border bg-surface text-[0.6875rem] text-muted-foreground">
 				<tr>
 					<th class="w-28 px-4 py-2 font-medium">When</th>
 					<th class="w-48 px-4 py-2 font-medium">Connection</th>
@@ -98,25 +98,25 @@
 					<tr class="align-top hover:bg-accent/30">
 						<td class="px-4 py-2.5 text-xs text-muted-foreground" title={new Date(r.startedAt).toLocaleString()}>
 							{ago(r.startedAt)}
-							<p class="mt-0.5 text-[11px] opacity-80">{r.kind === 'restore' ? 'restore' : r.trigger === 'schedule' ? (r.scheduleName ?? 'schedule') : 'manual'}</p>
+							<p class="mt-0.5 text-[0.6875rem] opacity-80">{r.kind === 'restore' ? 'restore' : r.trigger === 'schedule' ? (r.scheduleName ?? 'schedule') : 'manual'}</p>
 						</td>
 						<td class="truncate px-4 py-2.5 text-xs">
 							{#if r.connectionId && connections.list.some((c) => c.id === r.connectionId)}
 								<a class="hover:text-primary" href="/c/{r.connectionId}">{r.connectionName}</a>
 							{:else}{r.connectionName}{/if}
-							<p class="mt-0.5 truncate font-mono text-[11px] text-muted-foreground">{r.databases.join(', ') || '—'}</p>
+							<p class="mt-0.5 truncate font-mono text-[0.6875rem] text-muted-foreground">{r.databases.join(', ') || '—'}</p>
 						</td>
 						<td class="min-w-0 px-4 py-2.5">
 							<button class="block w-full min-w-0 text-left" onclick={() => (expanded = expanded === r.id ? null : r.id)}>
-								<p class="truncate font-mono text-[11px] {r.deletedAt ? 'text-muted-foreground line-through' : ''}">
+								<p class="truncate font-mono text-[0.6875rem] {r.deletedAt ? 'text-muted-foreground line-through' : ''}">
 									{#if r.kind === 'restore'}<RotateCcw class="mr-1 inline size-3" />{/if}{r.fileName ?? '—'}
 								</p>
-								<p class="mt-0.5 truncate text-[11px] text-muted-foreground">
+								<p class="mt-0.5 truncate text-[0.6875rem] text-muted-foreground">
 									{[`${r.kind === 'restore' ? 'from' : 'to'} ${r.destinationName}`, r.format && (FORMAT[r.format] ?? r.format), r.deletedAt && `deleted ${ago(r.deletedAt)}`].filter(Boolean).join(' · ')}
 								</p>
 							</button>
 							{#if expanded === r.id && (r.error || r.warnings)}
-								<pre class="mt-1.5 max-h-48 overflow-auto rounded-lg border border-border bg-surface p-2 font-mono text-[11px] whitespace-pre-wrap {r.error ? 'text-danger' : 'text-warning'}">{r.error ?? r.warnings}</pre>
+								<pre class="mt-1.5 max-h-48 overflow-auto rounded-lg border border-border bg-surface p-2 font-mono text-[0.6875rem] whitespace-pre-wrap {r.error ? 'text-danger' : 'text-warning'}">{r.error ?? r.warnings}</pre>
 							{/if}
 						</td>
 						<td class="px-4 py-2.5 text-right font-mono text-xs tabular-nums">{r.sizeBytes != null ? bytes(r.sizeBytes) : '—'}</td>
@@ -166,7 +166,7 @@
 		</div>
 		<div class="flex items-center justify-between gap-3">
 			<div>
-				<p class="text-[13px]">Compress</p>
+				<p class="text-[0.8125rem]">Compress</p>
 				<p class="text-xs text-muted-foreground">gzip for MySQL/MariaDB; pg_dump's own compression for Postgres.</p>
 			</div>
 			<Switch bind:checked={adhoc.compress} label="Compress" />

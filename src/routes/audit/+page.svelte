@@ -96,8 +96,8 @@
 	<div class="space-y-4 px-8 pb-10">
 		<div class="flex flex-wrap items-center gap-2">
 			<div class="inline-flex rounded-xl border border-border bg-surface p-1">
-				<button class="flex h-8 items-center gap-1.5 rounded-lg px-3 text-[13px] {tab === 'queries' ? 'bg-card text-foreground shadow-surface' : 'text-muted-foreground'}" onclick={() => (tab = 'queries')}><SquareTerminal class="size-3.5" />Queries</button>
-				<button class="flex h-8 items-center gap-1.5 rounded-lg px-3 text-[13px] {tab === 'events' ? 'bg-card text-foreground shadow-surface' : 'text-muted-foreground'}" onclick={() => (tab = 'events')}><ScrollText class="size-3.5" />Events</button>
+				<button class="flex h-8 items-center gap-1.5 rounded-lg px-3 text-[0.8125rem] {tab === 'queries' ? 'bg-card text-foreground shadow-surface' : 'text-muted-foreground'}" onclick={() => (tab = 'queries')}><SquareTerminal class="size-3.5" />Queries</button>
+				<button class="flex h-8 items-center gap-1.5 rounded-lg px-3 text-[0.8125rem] {tab === 'events' ? 'bg-card text-foreground shadow-surface' : 'text-muted-foreground'}" onclick={() => (tab = 'events')}><ScrollText class="size-3.5" />Events</button>
 			</div>
 			<select class="input h-9 w-48 text-xs" bind:value={filter.user}>
 				<option value="">Everyone</option>
@@ -120,8 +120,8 @@
 
 		<div class="card overflow-hidden">
 			{#if tab === 'queries'}
-				<table class="w-full table-fixed text-left text-[13px]">
-					<thead class="border-b border-border bg-surface text-[11px] text-muted-foreground">
+				<table class="w-full table-fixed text-left text-[0.8125rem]">
+					<thead class="border-b border-border bg-surface text-[0.6875rem] text-muted-foreground">
 						<tr>
 							<th class="w-32 px-4 py-2 font-medium">When</th>
 							<th class="w-48 px-4 py-2 font-medium">Who</th>
@@ -140,16 +140,16 @@
 								</td>
 								<td class="min-w-0 px-4 py-2.5">
 									<button class="block w-full text-left" onclick={() => (expanded = expanded === h.id ? null : h.id)}>
-										<pre class="font-mono text-[11px] whitespace-pre-wrap {expanded === h.id ? '' : 'line-clamp-2'}">{h.sql}</pre>
+										<pre class="font-mono text-[0.6875rem] whitespace-pre-wrap {expanded === h.id ? '' : 'line-clamp-2'}">{h.sql}</pre>
 									</button>
-									{#if h.error && expanded === h.id}<p class="mt-1 font-mono text-[11px] text-danger">{h.error}</p>{/if}
+									{#if h.error && expanded === h.id}<p class="mt-1 font-mono text-[0.6875rem] text-danger">{h.error}</p>{/if}
 								</td>
 								<td class="px-4 py-2.5 text-right text-xs whitespace-nowrap">
 									<div class="flex items-center justify-end gap-1.5">
 										{#if !h.readOnly}<span class="badge badge-warning">write</span>{/if}
 										{#if h.ok}<CircleCheck class="size-3.5 text-success" />{:else}<CircleAlert class="size-3.5 text-danger" />{/if}
 									</div>
-									<p class="mt-1 text-[11px] text-muted-foreground">{duration(h.durationMs)}{#if h.rowCount != null} · {h.rowCount} rows{/if}</p>
+									<p class="mt-1 text-[0.6875rem] text-muted-foreground">{duration(h.durationMs)}{#if h.rowCount != null} · {h.rowCount} rows{/if}</p>
 								</td>
 							</tr>
 						{:else}
@@ -158,8 +158,8 @@
 					</tbody>
 				</table>
 			{:else}
-				<table class="w-full table-fixed text-left text-[13px]">
-					<thead class="border-b border-border bg-surface text-[11px] text-muted-foreground">
+				<table class="w-full table-fixed text-left text-[0.8125rem]">
+					<thead class="border-b border-border bg-surface text-[0.6875rem] text-muted-foreground">
 						<tr>
 							<th class="w-32 px-4 py-2 font-medium">When</th>
 							<th class="w-48 px-4 py-2 font-medium">Who</th>
@@ -176,13 +176,13 @@
 								<td class="px-4 py-2.5 text-xs">
 									<span class={tone(e.action)}>{ACTIONS[e.action] ?? e.action}</span>
 									{#if e.connectionName}
-										<p class="truncate text-[11px] text-muted-foreground">
+										<p class="truncate text-[0.6875rem] text-muted-foreground">
 											{#if connections.list.some((c) => c.id === e.connectionId)}<a class="hover:text-primary" href="/c/{e.connectionId}">{e.connectionName}</a>{:else}{e.connectionName}{/if}
 										</p>
 									{/if}
 								</td>
 								<td class="px-4 py-2.5 text-xs break-words text-muted-foreground">{e.detail ?? ''}</td>
-								<td class="truncate px-4 py-2.5 font-mono text-[11px] text-muted-foreground">{e.ip ?? ''}</td>
+								<td class="truncate px-4 py-2.5 font-mono text-[0.6875rem] text-muted-foreground">{e.ip ?? ''}</td>
 							</tr>
 						{:else}
 							<tr><td colspan="5" class="px-4 py-10 text-center text-xs text-muted-foreground">{loading ? 'Loading…' : 'Nothing recorded yet.'}</td></tr>

@@ -77,7 +77,7 @@
 
 	<div class="space-y-4 px-8 pb-10">
 		{#if missing.length}
-			<div class="card flex gap-3 border-warning/40 bg-warning/5 p-4 text-[13px]">
+			<div class="card flex gap-3 border-warning/40 bg-warning/5 p-4 text-[0.8125rem]">
 				<TriangleAlert class="mt-0.5 size-4 shrink-0 text-warning" />
 				<div>
 					<p class="font-medium">Missing client tools: {missing.join(', ')}</p>
@@ -95,7 +95,7 @@
 					<button
 						role="tab"
 						aria-selected={tab === t.key}
-						class="flex h-8 items-center gap-1.5 rounded-lg px-3 text-[13px] {tab === t.key ? 'bg-card text-foreground shadow-surface' : 'text-muted-foreground'}"
+						class="flex h-8 items-center gap-1.5 rounded-lg px-3 text-[0.8125rem] {tab === t.key ? 'bg-card text-foreground shadow-surface' : 'text-muted-foreground'}"
 						onclick={() => selectTab(t.key)}
 					>
 						<t.icon class="size-3.5" />{t.label}

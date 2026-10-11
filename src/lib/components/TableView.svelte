@@ -400,7 +400,7 @@
 				if (showFilters && !filters.length) filters.push({ column: columns[0]?.name ?? '', op: '=', value: '' });
 			}}
 		>
-			<Filter />Filter{#if activeFilters.length}<span class="rounded bg-primary-soft px-1 text-[10px]">{activeFilters.length}</span>{/if}
+			<Filter />Filter{#if activeFilters.length}<span class="rounded bg-primary-soft px-1 text-[0.625rem]">{activeFilters.length}</span>{/if}
 		</button>
 		{#if info && isTable}
 			{#if !canWrite && info.writable}
@@ -459,7 +459,7 @@
 		<div class="space-y-1.5 border-b border-border bg-surface px-3 py-2">
 			{#each filters as f, i (i)}
 				<div class="flex items-center gap-1.5">
-					<span class="w-10 text-right text-[11px] text-muted-foreground">{i === 0 ? 'where' : 'and'}</span>
+					<span class="w-10 text-right text-[0.6875rem] text-muted-foreground">{i === 0 ? 'where' : 'and'}</span>
 					<select class="input h-7 w-44 font-mono text-xs" bind:value={f.column} disabled={dirty}>
 						{#each columns as c (c.name)}<option value={c.name}>{c.name}</option>{/each}
 					</select>
@@ -517,7 +517,7 @@
 		<CellInspector bind:cell={selected} />
 	</div>
 
-	<div class="flex items-center gap-3 border-t border-border bg-surface px-3 py-1.5 text-[11px] text-muted-foreground">
+	<div class="flex items-center gap-3 border-t border-border bg-surface px-3 py-1.5 text-[0.6875rem] text-muted-foreground">
 		<span class="tabular-nums">
 			{#if rows.length}{int(offset + 1)}–{int(pageEnd)}{:else}0{/if}
 			{#if total != null}of {totalIsEstimate ? '~' : ''}{int(total)}{/if} rows
@@ -525,7 +525,7 @@
 		<span class="tabular-nums">{durationMs} ms</span>
 		{#if canWrite && hasKey}<span class="hidden md:inline">Double-click a cell to edit · click row numbers to select</span>{/if}
 		<div class="ml-auto flex items-center gap-1">
-			<select class="input h-6 w-20 py-0 text-[11px]" bind:value={limit} disabled={dirty} onchange={() => (offset = 0)}>
+			<select class="input h-7 w-28 py-0 text-xs" bind:value={limit} disabled={dirty} onchange={() => (offset = 0)}>
 				{#each [50, 100, 250, 500, 1000] as n (n)}<option value={n}>{n} / page</option>{/each}
 			</select>
 			<button class="btn btn-ghost btn-icon btn-sm" disabled={offset === 0 || dirty} onclick={() => (offset = Math.max(0, offset - limit))} aria-label="Previous page"><ChevronLeft /></button>
@@ -537,7 +537,7 @@
 <Dialog bind:open={reviewOpen} title="Review changes" description="These statements run in one transaction on {schema}.{table}. If any of them fails or finds the row changed since you loaded it, nothing is saved." width="max-w-3xl">
 	<ol class="space-y-1.5">
 		{#each statements as s, i (i)}
-			<li class="rounded-lg border {failure?.index === i ? 'border-danger/50 bg-danger/5' : 'border-border bg-surface'} px-3 py-2 font-mono text-[12px] whitespace-pre-wrap [overflow-wrap:anywhere]">
+			<li class="rounded-lg border {failure?.index === i ? 'border-danger/50 bg-danger/5' : 'border-border bg-surface'} px-3 py-2 font-mono text-xs whitespace-pre-wrap [overflow-wrap:anywhere]">
 				<span class="mr-2 text-muted-foreground select-none">{i + 1}</span>{s};
 			</li>
 		{/each}

@@ -167,7 +167,7 @@
 
 {#snippet sidePicker(side: 'from' | 'to', value: Side)}
 	<div class="flex min-w-0 flex-1 items-center gap-1.5">
-		<span class="w-10 shrink-0 text-[11px] font-medium text-muted-foreground uppercase">{side}</span>
+		<span class="w-10 shrink-0 text-[0.6875rem] font-medium text-muted-foreground uppercase">{side}</span>
 		<select class="input h-8 w-44 shrink-0 text-xs" value={value.connectionId} onchange={(e) => pickConnection(side, e.currentTarget.value)} aria-label="{side} connection">
 			{#each peers as p (p.id)}<option value={p.id}>{p.id === conn.id ? `${p.name} (this)` : p.name}</option>{/each}
 		</select>
@@ -190,7 +190,7 @@
 	<aside class="flex w-80 shrink-0 flex-col border-r border-border bg-surface/40">
 		<div class="flex items-center gap-2 border-b border-border px-3 py-2.5">
 			<History class="size-4 text-primary" />
-			<h2 class="text-[13px] font-semibold">Schema history</h2>
+			<h2 class="text-[0.8125rem] font-semibold">Schema history</h2>
 			<button class="btn btn-ghost btn-icon btn-sm ml-auto" title="Refresh" onclick={load} disabled={loading}><RefreshCw class={loading ? 'animate-spin' : ''} /></button>
 			<button class="btn btn-primary btn-sm" onclick={() => (composing = !composing)} disabled={listing?.supported === false}><Camera />Snapshot</button>
 		</div>
@@ -219,11 +219,11 @@
 				<div class="flex items-center gap-2.5">
 					<div class="min-w-0 flex-1">
 						<p class="text-xs font-medium">Auto snapshot on change</p>
-						<p class="text-[11px] leading-snug text-muted-foreground">Checked every 6 h; stored only when the schema hash changes (e.g. after an app upgrade).</p>
+						<p class="text-[0.6875rem] leading-snug text-muted-foreground">Checked every 6 h; stored only when the schema hash changes (e.g. after an app upgrade).</p>
 					</div>
 					<Switch label="Auto snapshot on change" checked={listing.settings.auto} onchange={setAuto} />
 				</div>
-				<div class="flex items-center gap-2 text-[11px] text-muted-foreground">
+				<div class="flex items-center gap-2 text-[0.6875rem] text-muted-foreground">
 					<span class="min-w-0 flex-1 truncate" title={listing.settings.lastError ?? undefined}>
 						{#if listing.settings.lastError}<span class="text-danger">Last check failed: {listing.settings.lastError}</span>
 						{:else if listing.settings.lastCheckedAt}Last checked {ago(listing.settings.lastCheckedAt)}
@@ -241,7 +241,7 @@
 				<span class="relative z-10 mt-0.5 grid size-5 shrink-0 place-items-center rounded-full bg-primary-soft ring-4 ring-surface"><span class="size-2 rounded-full bg-primary"></span></span>
 				<div class="min-w-0 flex-1">
 					<p class="text-xs font-medium">Live schema</p>
-					<p class="text-[11px] text-muted-foreground">Read from the server when compared</p>
+					<p class="text-[0.6875rem] text-muted-foreground">Read from the server when compared</p>
 				</div>
 				{#if snapshots[0]}
 					<button class="btn btn-ghost btn-sm -mr-1.5" title="Compare the latest snapshot with the live schema" onclick={() => compareWith({ connectionId: conn.id, version: snapshots[0].id }, { connectionId: conn.id, version: 'live' })}>
@@ -260,20 +260,20 @@
 					<div class="min-w-0 flex-1">
 						<div class="flex items-center gap-1.5">
 							<p class="truncate text-xs font-medium" title={s.label}>{s.label}</p>
-							{#if s.auto}<span class="badge h-4 px-1 text-[10px]">auto</span>{/if}
+							{#if s.auto}<span class="badge h-4 px-1 text-[0.625rem]">auto</span>{/if}
 						</div>
-						<p class="text-[11px] text-muted-foreground" title={new Date(s.createdAt).toLocaleString()}>
+						<p class="text-[0.6875rem] text-muted-foreground" title={new Date(s.createdAt).toLocaleString()}>
 							{ago(s.createdAt)}{s.createdBy ? ` · ${s.createdBy}` : ''}
 						</p>
-						{#if s.note}<p class="mt-0.5 line-clamp-2 text-[11px] text-muted-foreground/90">{s.note}</p>{/if}
-						<p class="mt-0.5 font-mono text-[10.5px] text-muted-foreground/80">
+						{#if s.note}<p class="mt-0.5 line-clamp-2 text-[0.6875rem] text-muted-foreground/90">{s.note}</p>{/if}
+						<p class="mt-0.5 font-mono text-[0.65625rem] text-muted-foreground/80">
 							{s.stats.tables} tables · {s.stats.columns} cols · {s.stats.views} views · {s.stats.routines} fn · {bytes(s.sizeBytes)}
 							{#if same}<span class="text-muted-foreground"> · no change</span>{/if}
 						</p>
 						<div class="mt-1 flex flex-wrap gap-1 opacity-70 group-hover:opacity-100">
-							<button class="btn btn-ghost btn-sm h-6 px-1.5 text-[11px]" onclick={() => compareWith({ connectionId: conn.id, version: s.id }, { connectionId: conn.id, version: 'live' })}>vs live</button>
+							<button class="btn btn-ghost btn-sm h-6 px-1.5 text-[0.6875rem]" onclick={() => compareWith({ connectionId: conn.id, version: s.id }, { connectionId: conn.id, version: 'live' })}>vs live</button>
 							{#if prev}
-								<button class="btn btn-ghost btn-sm h-6 px-1.5 text-[11px]" onclick={() => compareWith({ connectionId: conn.id, version: prev.id }, { connectionId: conn.id, version: s.id })}>vs previous</button>
+								<button class="btn btn-ghost btn-sm h-6 px-1.5 text-[0.6875rem]" onclick={() => compareWith({ connectionId: conn.id, version: prev.id }, { connectionId: conn.id, version: s.id })}>vs previous</button>
 							{/if}
 							<button class="btn btn-ghost btn-icon btn-sm size-6" title="Download as JSON" onclick={() => exportJson(s)}><Download /></button>
 							{#if s.canDelete}
@@ -315,7 +315,7 @@
 				<div class="grid h-full place-items-center">
 					<div class="max-w-sm text-center">
 						<GitCompareArrows class="mx-auto size-8 text-muted-foreground/60" />
-						<p class="mt-3 text-[13px] font-medium">Compare two schemas</p>
+						<p class="mt-3 text-[0.8125rem] font-medium">Compare two schemas</p>
 						<p class="mt-1 text-xs text-muted-foreground">
 							Pick a snapshot or the live schema on each side — of this connection or another {conn.engine === 'mysql' ? 'MySQL/MariaDB' : 'Postgres'} connection — to see
 							added, removed and changed tables, columns, indexes, views and functions.

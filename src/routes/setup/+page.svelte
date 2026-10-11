@@ -90,14 +90,14 @@
 		<div class="mb-6 flex flex-col items-center text-center">
 			<Logo size={44} />
 			<h1 class="mt-4 text-lg font-semibold tracking-tight">Welcome to pg·modern</h1>
-			<p class="mt-1 text-[13px] text-muted-foreground">A couple of minutes and you're browsing your databases.</p>
+			<p class="mt-1 text-[0.8125rem] text-muted-foreground">A couple of minutes and you're browsing your databases.</p>
 		</div>
 
 		<ol class="mb-5 flex items-center justify-center gap-2 text-xs">
 			{#each steps as s, i (s.n)}
 				<li class="flex items-center gap-2 {step >= s.n ? 'text-foreground' : 'text-muted-foreground'}">
 					<span
-						class="grid size-5 place-items-center rounded-full text-[10px] font-semibold {step > s.n
+						class="grid size-5 place-items-center rounded-full text-[0.625rem] font-semibold {step > s.n
 							? 'bg-primary text-primary-foreground'
 							: step === s.n
 								? 'bg-primary-soft text-primary ring-1 ring-primary/50'
@@ -114,7 +114,7 @@
 		<div class="card p-7 shadow-surface-lg">
 			{#if step === 1}
 				<form onsubmit={createAdmin}>
-					<h2 class="flex items-center gap-2 text-[15px] font-semibold"><UserRound class="size-4 text-primary" />Create the admin account</h2>
+					<h2 class="flex items-center gap-2 text-[0.9375rem] font-semibold"><UserRound class="size-4 text-primary" />Create the admin account</h2>
 					<p class="mt-1 text-xs text-muted-foreground">This account manages connections, integrations and users. You can add more people later, or turn on single sign-on.</p>
 					<div class="mt-5 grid gap-3">
 						<div>
@@ -143,12 +143,12 @@
 					</button>
 				</form>
 			{:else if step === 2}
-				<h2 class="flex items-center gap-2 text-[15px] font-semibold"><Radar class="size-4 text-primary" />Where do your databases live?</h2>
+				<h2 class="flex items-center gap-2 text-[0.9375rem] font-semibold"><Radar class="size-4 text-primary" />Where do your databases live?</h2>
 				<p class="mt-1 text-xs text-muted-foreground">All optional — you can change these any time under Integrations.</p>
 
 				<div class="mt-5 space-y-3">
 					<div class="rounded-xl border border-border p-4">
-						<p class="flex items-center gap-2 text-[13px] font-medium"><Container class="size-4 text-primary" />Docker on this host</p>
+						<p class="flex items-center gap-2 text-[0.8125rem] font-medium"><Container class="size-4 text-primary" />Docker on this host</p>
 						{#if env?.dockerHosts.length}
 							<p class="mt-1.5 flex items-center gap-1.5 text-xs text-success"><CircleCheck class="size-3.5" />Found <code class="font-mono">{env.dockerHosts.join(', ')}</code></p>
 						{:else}
@@ -159,7 +159,7 @@
 					</div>
 
 					<form class="rounded-xl border border-border p-4" onsubmit={connectArcane}>
-						<p class="flex items-center gap-2 text-[13px] font-medium"><Boxes class="size-4 text-primary" />Arcane</p>
+						<p class="flex items-center gap-2 text-[0.8125rem] font-medium"><Boxes class="size-4 text-primary" />Arcane</p>
 						{#if arcaneState === 'connected'}
 							<p class="mt-1.5 flex items-center gap-1.5 text-xs text-success"><CircleCheck class="size-3.5" />Connected — {arcaneEnvs} environment{arcaneEnvs === 1 ? '' : 's'}.</p>
 						{:else}
@@ -182,7 +182,7 @@
 					</form>
 
 					<form class="rounded-xl border border-border p-4" onsubmit={addFolder}>
-						<p class="flex items-center gap-2 text-[13px] font-medium"><FolderSearch class="size-4 text-primary" />Folders with .env / compose / Terraform files</p>
+						<p class="flex items-center gap-2 text-[0.8125rem] font-medium"><FolderSearch class="size-4 text-primary" />Folders with .env / compose / Terraform files</p>
 						<div class="mt-2 flex flex-wrap gap-1.5">
 							{#each [...(env?.scanPaths ?? []), ...settings.scanPaths] as p (p)}
 								<span class="badge h-6 font-mono">{p}</span>
@@ -202,7 +202,7 @@
 			{:else}
 				<div class="text-center">
 					<div class="mx-auto grid size-12 place-items-center rounded-full bg-success/10 text-success"><Check class="size-6" /></div>
-					<h2 class="mt-4 text-[15px] font-semibold">You're set up</h2>
+					<h2 class="mt-4 text-[0.9375rem] font-semibold">You're set up</h2>
 					<p class="mt-1.5 text-xs text-muted-foreground">
 						Next, pick the databases you want from Discover. Everything you import starts read-only.
 					</p>

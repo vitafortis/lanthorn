@@ -109,11 +109,11 @@
 
 <div class="h-full overflow-y-auto">
 	<div class="sticky top-0 z-10 flex flex-wrap items-center gap-2 border-b border-border bg-background/85 px-5 py-2 backdrop-blur">
-		<h2 class="flex items-center gap-2 text-[13px] font-semibold"><HeartPulse class="size-4 text-primary" />Health</h2>
-		<span class="text-[11px] text-muted-foreground">Read-only checks · suggested fixes are never run for you</span>
+		<h2 class="flex items-center gap-2 text-[0.8125rem] font-semibold"><HeartPulse class="size-4 text-primary" />Health</h2>
+		<span class="text-[0.6875rem] text-muted-foreground">Read-only checks · suggested fixes are never run for you</span>
 		<div class="ml-auto flex items-center gap-2">
 			{#if report}
-				<span class="text-[11px] text-muted-foreground tabular-nums">Checked {ranAgo} · {duration(report.durationMs)}</span>
+				<span class="text-[0.6875rem] text-muted-foreground tabular-nums">Checked {ranAgo} · {duration(report.durationMs)}</span>
 			{/if}
 			<button class="btn btn-secondary btn-sm" onclick={run} disabled={loading}>
 				<RefreshCw class={loading ? 'animate-spin' : ''} />{loading ? 'Running…' : 'Re-run'}
@@ -123,7 +123,7 @@
 
 	{#if !report && error}
 		<div class="m-5 rounded-xl border border-danger/30 bg-danger/5 p-4">
-			<p class="text-[13px] font-medium">Could not run the health checks</p>
+			<p class="text-[0.8125rem] font-medium">Could not run the health checks</p>
 			<p class="mt-1 font-mono text-xs text-muted-foreground">{error}</p>
 			<button class="btn btn-secondary btn-sm mt-3" onclick={run}><RefreshCw />Try again</button>
 		</div>
@@ -176,7 +176,7 @@
 				<div class="card flex items-center gap-3 p-4">
 					<CircleCheck class="size-5 text-success" />
 					<div>
-						<p class="text-[13px] font-medium">Nothing to report</p>
+						<p class="text-[0.8125rem] font-medium">Nothing to report</p>
 						<p class="text-xs text-muted-foreground">Every check passed. Statistics-based checks are only as good as the statistics, so re-run after a busy day.</p>
 					</div>
 				</div>
@@ -188,7 +188,7 @@
 					<button class="flex w-full items-center gap-2.5 px-4 py-3 text-left hover:bg-accent/40" aria-expanded={open} onclick={() => toggle(c.id)}>
 						<ChevronRight class="size-3.5 shrink-0 text-muted-foreground transition-transform {open ? 'rotate-90' : ''}" />
 						{@render statusIcon(c)}
-						<span class="text-[13px] font-semibold">{c.title}</span>
+						<span class="text-[0.8125rem] font-semibold">{c.title}</span>
 						{#if c.status === 'error'}
 							<span class="badge badge-danger">error</span>
 						{:else}
@@ -198,7 +198,7 @@
 							{/each}
 							{#if c.truncated}<span class="badge" title="Only the most important findings are listed">more not shown</span>{/if}
 						{/if}
-						<span class="ml-auto hidden text-[11px] text-muted-foreground sm:inline">{appliesTo(c.id)}</span>
+						<span class="ml-auto hidden text-[0.6875rem] text-muted-foreground sm:inline">{appliesTo(c.id)}</span>
 					</button>
 					{#if open}
 						<div class="space-y-3 border-t border-border px-4 py-3">
@@ -207,17 +207,17 @@
 								{#if c.note}<span class="text-foreground/80">{c.note}</span>{/if}
 							</p>
 							{#if c.error}
-								<p class="flex items-start gap-2 rounded-lg bg-danger/5 p-2.5 font-mono text-[11px] text-danger">
+								<p class="flex items-start gap-2 rounded-lg bg-danger/5 p-2.5 font-mono text-[0.6875rem] text-danger">
 									<TriangleAlert class="mt-px size-3.5 shrink-0" />{c.error}
 								</p>
-								<p class="text-[11px] text-muted-foreground">The other checks ran normally. Missing privileges are the usual cause — on Postgres, membership in pg_monitor (or pg_read_all_stats) helps.</p>
+								<p class="text-[0.6875rem] text-muted-foreground">The other checks ran normally. Missing privileges are the usual cause — on Postgres, membership in pg_monitor (or pg_read_all_stats) helps.</p>
 							{/if}
 							{#each c.findings.filter((f) => filter === 'all' || f.severity === filter) as f, i (i)}
 								{@const S = SEV[f.severity]}
 								<div class="rounded-lg border border-border bg-surface/60 p-3">
 									<div class="flex items-start gap-2">
 										<span class="badge {S.badge} mt-px shrink-0"><S.icon />{S.label}</span>
-										<p class="text-[13px] font-medium leading-snug">{f.title}</p>
+										<p class="text-[0.8125rem] font-medium leading-snug">{f.title}</p>
 									</div>
 									<p class="mt-1.5 text-xs leading-relaxed text-muted-foreground">{f.explanation}</p>
 									{#if f.objects.length}
@@ -228,13 +228,13 @@
 									{#if f.fix}
 										<div class="mt-2.5 overflow-hidden rounded-lg border border-border bg-background">
 											<div class="flex items-center gap-1 border-b border-border px-2 py-1">
-												<span class="mr-auto text-[11px] text-muted-foreground">Suggested fix — review before running</span>
+												<span class="mr-auto text-[0.6875rem] text-muted-foreground">Suggested fix — review before running</span>
 												<button class="btn btn-ghost btn-sm" onclick={() => copyText(f.fix!, 'SQL copied')}><Copy />Copy</button>
 												{#if onquery}
 													<button class="btn btn-ghost btn-sm" onclick={() => onquery(f.fix!)}><SquareTerminal />Open in query editor</button>
 												{/if}
 											</div>
-											<pre class="overflow-x-auto px-3 py-2 font-mono text-[11.5px] leading-relaxed whitespace-pre">{f.fix}</pre>
+											<pre class="overflow-x-auto px-3 py-2 font-mono text-[0.71875rem] leading-relaxed whitespace-pre">{f.fix}</pre>
 										</div>
 									{/if}
 								</div>
@@ -247,17 +247,17 @@
 			{#if quiet.length && filter === 'all'}
 				<section class="card overflow-hidden">
 					<div class="border-b border-border px-4 py-2.5">
-						<h3 class="text-[13px] font-semibold">Passed{quiet.some((c) => c.status === 'skipped') ? ' and skipped' : ''}</h3>
+						<h3 class="text-[0.8125rem] font-semibold">Passed{quiet.some((c) => c.status === 'skipped') ? ' and skipped' : ''}</h3>
 					</div>
 					<ul class="divide-y divide-border">
 						{#each quiet as c (c.id)}
 							<li class="flex items-start gap-2.5 px-4 py-2.5">
 								<span class="mt-px">{@render statusIcon(c)}</span>
 								<div class="min-w-0 flex-1">
-									<p class="text-[13px]">{c.title}{#if c.status === 'skipped'}<span class="ml-1.5 badge">skipped</span>{/if}</p>
-									<p class="text-[11px] text-muted-foreground">{c.note ?? checkInfo(c.id)?.description}</p>
+									<p class="text-[0.8125rem]">{c.title}{#if c.status === 'skipped'}<span class="ml-1.5 badge">skipped</span>{/if}</p>
+									<p class="text-[0.6875rem] text-muted-foreground">{c.note ?? checkInfo(c.id)?.description}</p>
 								</div>
-								<span class="hidden text-[11px] text-muted-foreground sm:inline">{appliesTo(c.id)}</span>
+								<span class="hidden text-[0.6875rem] text-muted-foreground sm:inline">{appliesTo(c.id)}</span>
 							</li>
 						{/each}
 					</ul>

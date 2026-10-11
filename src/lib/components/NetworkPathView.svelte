@@ -16,7 +16,7 @@
 	}
 </script>
 
-<div class="mt-1.5 flex flex-wrap items-center gap-1 text-[11px]">
+<div class="mt-1.5 flex flex-wrap items-center gap-1 text-[0.6875rem]">
 	{#if path.via === 'shared-network'}
 		<span class="inline-flex items-center gap-1 text-success" title="pg·modern is attached to this network too, so it reaches the container by name">
 			<Network class="size-3" />via
@@ -49,11 +49,11 @@
 	{/if}
 </div>
 {#if open}
-	<div class="mt-2 rounded-lg border border-border bg-surface p-2.5 text-[11px] text-muted-foreground">
+	<div class="mt-2 rounded-lg border border-border bg-surface p-2.5 text-[0.6875rem] text-muted-foreground">
 		{#if path.join}
 			<p>Attach pg·modern to <span class="font-mono text-foreground">{path.join}</span> in its compose file, then <span class="font-mono">docker compose up -d</span>:</p>
 			<div class="relative mt-1.5">
-				<pre class="overflow-x-auto rounded-md border border-border bg-background p-2 font-mono text-[11px] text-foreground">{snippet}</pre>
+				<pre class="overflow-x-auto rounded-md border border-border bg-background p-2 font-mono text-[0.6875rem] text-foreground">{snippet}</pre>
 				<button class="btn btn-ghost btn-icon btn-sm absolute top-1 right-1" title="Copy" onclick={copy}>
 					{#if copied}<Check />{:else}<Copy />{/if}
 				</button>

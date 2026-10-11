@@ -256,13 +256,13 @@
 			<div class="inline-flex rounded-lg border border-border bg-surface p-0.5">
 				{#each [{ id: 'docker', label: 'Containers', icon: Container, count: dockerCount }, { id: 'files', label: 'Files', icon: FileCode2, count: fileCount }, { id: 'managers', label: 'Arcane', icon: Boxes, count: managersVisible }] as t (t.id)}
 					<button
-						class="flex h-7 items-center gap-2 rounded-md px-3 text-[13px] font-medium transition {tab === t.id
+						class="flex h-7 items-center gap-2 rounded-md px-3 text-[0.8125rem] font-medium transition {tab === t.id
 							? 'bg-card text-foreground shadow-surface'
 							: 'text-muted-foreground hover:text-foreground'}"
 						onclick={() => (tab = t.id as typeof tab)}
 					>
 						<t.icon class="size-3.5" />{t.label}
-						{#if t.count}<span class="rounded bg-primary-soft px-1.5 text-[11px] text-primary tabular-nums">{t.count}</span>{/if}
+						{#if t.count}<span class="rounded bg-primary-soft px-1.5 text-[0.6875rem] text-primary tabular-nums">{t.count}</span>{/if}
 					</button>
 				{/each}
 			</div>
@@ -295,7 +295,7 @@
 					<EyeOff />Hide saved
 				</button>
 				{#if hidden > 0}
-					<span class="text-[11px] text-muted-foreground">
+					<span class="text-[0.6875rem] text-muted-foreground">
 						{hidden} hidden ·
 						<button class="text-primary hover:underline" onclick={() => ((filters.running = false), (filters.reachable = false), (filters.unsaved = false))}>show all</button>
 					</span>
@@ -304,11 +304,11 @@
 			</div>
 
 			{#if selfInfo}
-				<div class="mb-3 flex flex-wrap items-center gap-1.5 text-[12px] text-muted-foreground">
+				<div class="mb-3 flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground">
 					<Network class="size-3.5" />
 					{#if selfInfo.container}
 						pg·modern runs as <span class="font-mono text-foreground">{selfInfo.container}</span> on
-						{#each selfInfo.networks as n (n)}<span class="rounded-md border border-success/30 bg-success/10 px-1.5 py-px font-mono text-[11px] text-success">{n}</span>{/each}
+						{#each selfInfo.networks as n (n)}<span class="rounded-md border border-success/30 bg-success/10 px-1.5 py-px font-mono text-[0.6875rem] text-success">{n}</span>{/each}
 						<span>— databases on these networks are reachable by name.</span>
 					{:else if selfInfo.inContainer}
 						pg·modern isn’t one of this host’s containers, so only published ports are reachable from it.
@@ -318,7 +318,7 @@
 				</div>
 			{/if}
 			{#if joinable.length}
-				<div class="card mb-4 border-warning/30 p-3.5 text-[12px]">
+				<div class="card mb-4 border-warning/30 p-3.5 text-xs">
 					<div class="flex flex-wrap items-center gap-2">
 						<Unplug class="size-4 text-warning" />
 						<span class="text-foreground">
@@ -334,7 +334,7 @@
 							{/each}
 						</ul>
 						<div class="relative mt-2">
-							<pre class="overflow-x-auto rounded-lg border border-border bg-surface p-3 font-mono text-[11px] text-foreground">{joinNetworksSnippet(joinable.map((j) => j.network))}</pre>
+							<pre class="overflow-x-auto rounded-lg border border-border bg-surface p-3 font-mono text-[0.6875rem] text-foreground">{joinNetworksSnippet(joinable.map((j) => j.network))}</pre>
 							<button
 								class="btn btn-ghost btn-icon btn-sm absolute top-1.5 right-1.5"
 								title="Copy"
@@ -382,9 +382,9 @@
 										<div class="card overflow-hidden">
 											<div class="flex items-center gap-3 border-b border-border bg-surface px-4 py-2.5">
 												<span class="size-2 rounded-full {c.state === 'running' ? 'bg-success shadow-[0_0_6px_var(--success)]' : 'bg-muted-foreground/40'}"></span>
-												<span class="text-[13px] font-medium">{c.name}</span>
-												<span class="truncate font-mono text-[11px] text-muted-foreground">{c.image}</span>
-												<span class="ml-auto text-[11px] text-muted-foreground">{c.status}</span>
+												<span class="text-[0.8125rem] font-medium">{c.name}</span>
+												<span class="truncate font-mono text-[0.6875rem] text-muted-foreground">{c.image}</span>
+												<span class="ml-auto text-[0.6875rem] text-muted-foreground">{c.status}</span>
 											</div>
 											<div class="divide-y divide-border">
 												{#each c.candidates as cand, i (i)}
@@ -419,7 +419,7 @@
 							</section>
 						{/each}
 						{#if docker.every((g) => g.endpoint.startsWith('unix://'))}
-							<p class="text-[11px] text-muted-foreground">
+							<p class="text-[0.6875rem] text-muted-foreground">
 								Only the Docker on the machine running pg·modern is scanned. Databases on other hosts? Connect
 								<a class="text-primary" href="/integrations#arcane">Arcane</a> or add a <a class="text-primary" href="/integrations#docker">tcp:// endpoint</a>.
 							</p>
@@ -457,15 +457,15 @@
 											{#if env.error}<span class="badge badge-danger">{env.error}</span>{/if}
 										</div>
 										{#if env.projectsRead !== undefined || env.containersInspected !== undefined}
-											<p class="mb-2 pl-1 text-[11px] text-muted-foreground">
+											<p class="mb-2 pl-1 text-[0.6875rem] text-muted-foreground">
 												Read {env.projectsRead ?? 0} project{env.projectsRead === 1 ? '' : 's'}{#if env.containersInspected !== undefined}{' '}and inspected {env.containersInspected} container{env.containersInspected === 1 ? '' : 's'}{/if}.
 											</p>
 										{/if}
 										{#if env.warning}
-											<p class="mb-2 flex items-center gap-1.5 pl-1 text-[11px] text-warning"><CircleAlert class="size-3.5 shrink-0" />{env.warning}</p>
+											<p class="mb-2 flex items-center gap-1.5 pl-1 text-[0.6875rem] text-warning"><CircleAlert class="size-3.5 shrink-0" />{env.warning}</p>
 										{/if}
 										{#each env.parseErrors ?? [] as pe (pe.project)}
-											<p class="mb-2 flex items-center gap-1.5 pl-1 text-[11px] text-warning">
+											<p class="mb-2 flex items-center gap-1.5 pl-1 text-[0.6875rem] text-warning">
 												<CircleAlert class="size-3.5 shrink-0" />{pe.project}: compose file didn't parse cleanly ({pe.message}); results may be incomplete.
 											</p>
 										{/each}
@@ -479,8 +479,8 @@
 												<div class="card overflow-hidden">
 													<div class="flex items-center gap-3 border-b border-border bg-surface px-4 py-2.5">
 														<span class="size-2 rounded-full {runningStatus(p.status) ? 'bg-success shadow-[0_0_6px_var(--success)]' : 'bg-muted-foreground/40'}"></span>
-														<span class="text-[13px] font-medium">{p.name}</span>
-														<span class="ml-auto text-[11px] text-muted-foreground capitalize">{p.status}</span>
+														<span class="text-[0.8125rem] font-medium">{p.name}</span>
+														<span class="ml-auto text-[0.6875rem] text-muted-foreground capitalize">{p.status}</span>
 													</div>
 													<div class="divide-y divide-border">
 														{#each p.candidates as cand, i (i)}
@@ -517,7 +517,7 @@
 				{/if}
 			{:else}
 				<div class="card mb-5 p-4">
-					<div class="mb-3 flex items-center gap-2 text-[13px] font-medium"><FolderSearch class="size-4 text-primary" />Scan folders</div>
+					<div class="mb-3 flex items-center gap-2 text-[0.8125rem] font-medium"><FolderSearch class="size-4 text-primary" />Scan folders</div>
 					<div class="flex flex-wrap gap-1.5">
 						{#each envRoots as root (root)}
 							<span class="badge h-6 font-mono" title="Set via PGM_SCAN_PATHS">{root}</span>
@@ -540,7 +540,7 @@
 						</button>
 					</form>
 					{#if files}
-						<p class="mt-3 text-[11px] text-muted-foreground">
+						<p class="mt-3 text-[0.6875rem] text-muted-foreground">
 							Checked {files.filesScanned} .env / compose / Terraform file{files.filesScanned === 1 ? '' : 's'} in {files.durationMs} ms.
 							{#if files.errors.length}<span class="text-warning">{files.errors.length} folder(s) unreadable: {files.errors.slice(0, 3).join(', ')}</span>{/if}
 						</p>
@@ -578,7 +578,7 @@
 	{#if selected.length}
 		<div class="pointer-events-none absolute inset-x-0 bottom-5 flex justify-center">
 			<div class="card pointer-events-auto flex items-center gap-4 py-2 pr-2 pl-4 shadow-surface-lg backdrop-blur">
-				<span class="text-[13px]"><span class="font-semibold tabular-nums">{selected.length}</span> selected</span>
+				<span class="text-[0.8125rem]"><span class="font-semibold tabular-nums">{selected.length}</span> selected</span>
 				<button class="btn btn-ghost btn-sm" onclick={() => selected.forEach((c) => (choices[c.key!].selected = false))}>Clear</button>
 				<button class="btn btn-primary" disabled={importing} onclick={importSelected}>
 					{#if importing}<LoaderCircle class="animate-spin" />{:else}<Download />{/if}Import {selected.length}

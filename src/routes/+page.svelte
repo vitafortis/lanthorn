@@ -135,7 +135,7 @@
 								</div>
 								<div class="min-w-0 flex-1">
 									<div class="flex items-center gap-2">
-										<h3 class="truncate text-[14px] font-semibold">{c.name}</h3>
+										<h3 class="truncate text-sm font-semibold">{c.name}</h3>
 										{#if s?.state === 'up'}
 											<span class="size-1.5 rounded-full bg-success shadow-[0_0_6px_var(--success)]" title="Online"></span>
 										{:else if s?.state === 'down'}
@@ -162,12 +162,12 @@
 								{/if}
 							</div>
 							{#if s?.state === 'down'}
-								<p class="mt-3 line-clamp-2 font-mono text-[11px] text-danger/90">{s.error}</p>
-								{#if s.hint}<p class="mt-1 line-clamp-3 text-[11px] text-muted-foreground">{s.hint}</p>{/if}
+								<p class="mt-3 line-clamp-2 font-mono text-[0.6875rem] text-danger/90">{s.error}</p>
+								{#if s.hint}<p class="mt-1 line-clamp-3 text-[0.6875rem] text-muted-foreground">{s.hint}</p>{/if}
 							{/if}
 						</a>
 						<SuperuserHint conn={c} online={s?.state === 'up'} />
-						<div class="relative flex items-center justify-between border-t border-border px-4 py-2 text-[11px] text-muted-foreground">
+						<div class="relative flex items-center justify-between border-t border-border px-4 py-2 text-[0.6875rem] text-muted-foreground">
 							<span>Last used {ago(c.lastConnectedAt)}{#if isAdmin()}{' · '}<a class="hover:text-primary" href="/backups">{lastBackup[c.id] ? `backed up ${ago(lastBackup[c.id].at)}` : 'no backup'}</a>{/if}</span>
 							{#if isAdmin()}
 								<div class="-mr-2 flex items-center opacity-0 group-focus-within:opacity-100 group-hover:opacity-100">

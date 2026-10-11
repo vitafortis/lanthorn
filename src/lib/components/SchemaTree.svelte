@@ -50,7 +50,7 @@
 		</button>
 	</div>
 
-	<div class="min-h-0 flex-1 overflow-y-auto py-1.5 text-[13px]">
+	<div class="min-h-0 flex-1 overflow-y-auto py-1.5 text-[0.8125rem]">
 		{#each schemas as s (s.name)}
 			{@const open = filter ? true : (expanded[s.name] ?? s.name === defaultSchema)}
 			<button
@@ -60,7 +60,7 @@
 				<ChevronRight class="size-3.5 shrink-0 transition-transform {open ? 'rotate-90' : ''}" />
 				{#if open}<FolderOpen class="size-3.5 shrink-0 text-primary" />{:else}<Folder class="size-3.5 shrink-0" />{/if}
 				<span class="truncate font-medium">{s.name}</span>
-				<span class="ml-auto pr-1 text-[10px] tabular-nums opacity-60">{s.relations.length}</span>
+				<span class="ml-auto pr-1 text-[0.625rem] tabular-nums opacity-60">{s.relations.length}</span>
 			</button>
 			{#if open}
 				{#each s.relations as r (r.name)}
@@ -76,11 +76,11 @@
 						<Icon class="size-3.5 shrink-0 {active === key ? 'text-primary' : 'opacity-70'}" />
 						<span class="truncate">{r.name}</span>
 						{#if r.kind !== 'view'}
-							<span class="ml-auto font-mono text-[10px] tabular-nums opacity-50">{compact(r.estimatedRows)}</span>
+							<span class="ml-auto font-mono text-[0.625rem] tabular-nums opacity-50">{compact(r.estimatedRows)}</span>
 						{/if}
 					</button>
 				{:else}
-					<p class="py-1 pl-9 text-[11px] text-muted-foreground/60 italic">empty</p>
+					<p class="py-1 pl-9 text-[0.6875rem] text-muted-foreground/60 italic">empty</p>
 				{/each}
 			{/if}
 		{/each}
@@ -89,7 +89,7 @@
 		{/if}
 	</div>
 
-	<label class="flex items-center gap-2 border-t border-border px-3 py-2 text-[11px] text-muted-foreground">
+	<label class="flex items-center gap-2 border-t border-border px-3 py-2 text-[0.6875rem] text-muted-foreground">
 		<input type="checkbox" class="accent-[var(--primary)]" bind:checked={showSystem} />
 		{engine === 'mysql' ? 'Show system databases' : engine === 'sqlite' ? 'Show sqlite_ tables' : 'Show system schemas'}
 	</label>

@@ -161,16 +161,16 @@
 		<a href="/integrations" class="card flex items-center gap-3 p-4 transition-colors hover:bg-accent/40">
 			<span class="grid size-9 place-items-center rounded-lg bg-primary-soft text-primary"><Plug class="size-4" /></span>
 			<div class="flex-1">
-				<p class="text-[13px] font-medium">Integrations</p>
+				<p class="text-[0.8125rem] font-medium">Integrations</p>
 				<p class="text-xs text-muted-foreground">Single sign-on, Arcane, Docker endpoints and scan folders.</p>
 			</div>
 			<ArrowRight class="size-4 text-muted-foreground" />
 		</a>
 
 		<section class="card p-5">
-			<h2 class="flex items-center gap-2 text-[14px] font-semibold"><ShieldCheck class="size-4 text-primary" />Security</h2>
+			<h2 class="flex items-center gap-2 text-sm font-semibold"><ShieldCheck class="size-4 text-primary" />Security</h2>
 			{#if env}
-				<div class="mt-4 grid gap-x-8 gap-y-3 text-[13px] md:grid-cols-2">
+				<div class="mt-4 grid gap-x-8 gap-y-3 text-[0.8125rem] md:grid-cols-2">
 					<div class="flex items-center justify-between gap-4"><span class="text-muted-foreground">Credential encryption</span><span class="font-mono text-xs">AES-256-GCM</span></div>
 					<div class="flex items-center justify-between gap-4"><span class="flex items-center gap-1.5 text-muted-foreground"><KeyRound class="size-3.5" />Master key</span><span class="font-mono text-xs">{env.keySource}</span></div>
 					<div class="flex items-center justify-between gap-4"><span class="text-muted-foreground">Data directory</span><span class="truncate font-mono text-xs">{env.dataDir}</span></div>
@@ -191,18 +191,18 @@
 		</section>
 
 		<section class="card p-5">
-			<h2 class="flex items-center gap-2 text-[14px] font-semibold"><Archive class="size-4 text-primary" />Backup &amp; restore</h2>
+			<h2 class="flex items-center gap-2 text-sm font-semibold"><Archive class="size-4 text-primary" />Backup &amp; restore</h2>
 			<p class="mt-1 text-xs text-muted-foreground">
 				An encrypted file with pg·modern's own configuration, sealed with a passphrase you choose instead of the master key, so it also restores on a new install. Query history and the audit log aren't included.
 			</p>
 
 			<div class="mt-4 grid gap-5 lg:grid-cols-2">
 				<form class="flex flex-col gap-3 rounded-xl border border-border p-4" onsubmit={exportBackup}>
-					<h3 class="flex items-center gap-2 text-[13px] font-medium"><Download class="size-3.5 text-muted-foreground" />Export</h3>
+					<h3 class="flex items-center gap-2 text-[0.8125rem] font-medium"><Download class="size-3.5 text-muted-foreground" />Export</h3>
 					<fieldset class="space-y-1.5">
 						<legend class="label">Include</legend>
 						{#each CATEGORIES as c (c.key)}
-							<label class="flex items-start gap-2.5 text-[13px]">
+							<label class="flex items-start gap-2.5 text-[0.8125rem]">
 								<input type="checkbox" class="mt-0.5 size-4 accent-[var(--primary)]" bind:checked={exp.include[c.key]} />
 								<span>{c.label} <span class="text-xs text-muted-foreground">· {c.hint}</span></span>
 							</label>
@@ -231,7 +231,7 @@
 				</form>
 
 				<form class="flex flex-col gap-3 rounded-xl border border-border p-4" onsubmit={previewRestore}>
-					<h3 class="flex items-center gap-2 text-[13px] font-medium"><Upload class="size-3.5 text-muted-foreground" />Restore</h3>
+					<h3 class="flex items-center gap-2 text-[0.8125rem] font-medium"><Upload class="size-3.5 text-muted-foreground" />Restore</h3>
 					<div>
 						<label class="label" for="bk-file">Backup file</label>
 						<input
@@ -260,12 +260,12 @@
 				{@const p = preview}
 				<div class="mt-5 overflow-x-auto rounded-xl border border-border">
 					<div class="flex flex-wrap items-center gap-x-3 gap-y-1 border-b border-border px-4 py-3">
-						<p class="text-[13px] font-medium">Backup from {new Date(p.createdAt).toLocaleString()}</p>
+						<p class="text-[0.8125rem] font-medium">Backup from {new Date(p.createdAt).toLocaleString()}</p>
 						<span class="font-mono text-xs text-muted-foreground">pg·modern {p.appVersion}</span>
 						<span class="ml-auto text-xs text-muted-foreground">Choose what to restore</span>
 					</div>
-					<table class="w-full text-[13px]">
-						<thead class="text-left text-[11px] tracking-wide text-muted-foreground uppercase">
+					<table class="w-full text-[0.8125rem]">
+						<thead class="text-left text-[0.6875rem] tracking-wide text-muted-foreground uppercase">
 							<tr class="border-b border-border">
 								<th class="w-10 px-4 py-2 font-medium"><span class="sr-only">Restore</span></th>
 								<th class="px-2 py-2 font-medium">Category</th>

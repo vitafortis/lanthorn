@@ -61,7 +61,7 @@
 
 <div class="space-y-4">
 	{#if diff.identical}
-		<div class="flex items-center gap-3 rounded-xl border border-success/30 bg-success/5 px-4 py-3 text-[13px]">
+		<div class="flex items-center gap-3 rounded-xl border border-success/30 bg-success/5 px-4 py-3 text-[0.8125rem]">
 			<CircleCheck class="size-4 text-success" />
 			<span><b class="font-medium">No differences.</b> <span class="text-muted-foreground">{sideLabel(from)} and {sideLabel(to)} have the same schema.</span></span>
 		</div>
@@ -73,7 +73,7 @@
 				onclick={() => (typeFilter = null)}
 			>
 				All
-				<span class="font-mono text-[11px]">
+				<span class="font-mono text-[0.6875rem]">
 					<span class="text-success">+{diff.total.added}</span> <span class="text-danger">−{diff.total.removed}</span> <span class="text-warning">~{diff.total.changed}</span>
 				</span>
 			</button>
@@ -84,7 +84,7 @@
 					onclick={() => (typeFilter = typeFilter === t ? null : t)}
 				>
 					{OBJECT_LABELS[t]}
-					<span class="font-mono text-[11px]">
+					<span class="font-mono text-[0.6875rem]">
 						{#if c.added}<span class="text-success">+{c.added}</span>{/if}
 						{#if c.removed}<span class="text-danger">−{c.removed}</span>{/if}
 						{#if c.changed}<span class="text-warning">~{c.changed}</span>{/if}
@@ -104,21 +104,21 @@
 		</div>
 
 		{#if from.bodiesOmitted || to.bodiesOmitted}
-			<p class="flex items-center gap-1.5 text-[11px] text-muted-foreground">
+			<p class="flex items-center gap-1.5 text-[0.6875rem] text-muted-foreground">
 				<TriangleAlert class="size-3.5 text-warning" />A snapshot was too large to keep function bodies; changed functions are detected by hash, without a text diff.
 			</p>
 		{/if}
 
 		{#each groups as g (g.type)}
 			<section>
-				<h3 class="mb-1.5 text-[11px] font-semibold tracking-wider text-muted-foreground uppercase">{OBJECT_LABELS[g.type]} <span class="font-normal normal-case">· {g.items.length}</span></h3>
+				<h3 class="mb-1.5 text-[0.6875rem] font-semibold tracking-wider text-muted-foreground uppercase">{OBJECT_LABELS[g.type]} <span class="font-normal normal-case">· {g.items.length}</span></h3>
 				<div class="overflow-hidden rounded-xl border border-border bg-card">
 					{#each g.items as item (item.key)}
 						{@const k = `${item.type}:${item.key}`}
 						{@const expandable = detailCount(item) > 0 || (hasText(item) && (item.before || item.after)) || item.bodyUnavailable}
 						<div class="border-b border-border last:border-b-0">
 							<button
-								class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px] hover:bg-accent/50 disabled:hover:bg-transparent"
+								class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[0.8125rem] hover:bg-accent/50 disabled:hover:bg-transparent"
 								disabled={!expandable}
 								onclick={() => (open[k] = !open[k])}
 								aria-expanded={!!open[k]}
@@ -129,11 +129,11 @@
 								{#if item.type === 'table' && item.change === 'changed'}
 									{@const cols = item.details.filter((d) => d.kind === 'column')}
 									{@const other = item.details.length - cols.length}
-									<span class="shrink-0 text-[11px] text-muted-foreground">
+									<span class="shrink-0 text-[0.6875rem] text-muted-foreground">
 										{#if cols.length}{cols.length} column{cols.length === 1 ? '' : 's'}{/if}{#if cols.length && other}, {/if}{#if other}{other} other{/if}
 									</span>
 								{:else if item.type === 'extension' && item.change === 'changed'}
-									<span class="shrink-0 font-mono text-[11px] text-muted-foreground">{item.before} → {item.after}</span>
+									<span class="shrink-0 font-mono text-[0.6875rem] text-muted-foreground">{item.before} → {item.after}</span>
 								{/if}
 							</button>
 							{#if open[k] && expandable}
@@ -164,9 +164,9 @@
 										</table>
 									{/if}
 									{#if item.bodyUnavailable}
-										<p class="text-[11px] text-muted-foreground">The definition changed (its hash differs), but one side didn't keep the text.</p>
+										<p class="text-[0.6875rem] text-muted-foreground">The definition changed (its hash differs), but one side didn't keep the text.</p>
 									{:else if hasText(item) && (item.before || item.after)}
-										<pre class="max-h-96 overflow-auto rounded-lg border border-border bg-background py-2 font-mono text-[11.5px] leading-[1.55]">{#each lineDiff(item.before, item.after) as l, i (i)}<div class="px-3 {l.op === 'add' ? 'bg-success/10 text-success' : l.op === 'del' ? 'bg-danger/10 text-danger' : 'text-muted-foreground'}"><span class="inline-block w-4 select-none opacity-70">{l.op === 'add' ? '+' : l.op === 'del' ? '−' : ' '}</span>{l.text || ' '}</div>{/each}</pre>
+										<pre class="max-h-96 overflow-auto rounded-lg border border-border bg-background py-2 font-mono text-[0.71875rem] leading-[1.55]">{#each lineDiff(item.before, item.after) as l, i (i)}<div class="px-3 {l.op === 'add' ? 'bg-success/10 text-success' : l.op === 'del' ? 'bg-danger/10 text-danger' : 'text-muted-foreground'}"><span class="inline-block w-4 select-none opacity-70">{l.op === 'add' ? '+' : l.op === 'del' ? '−' : ' '}</span>{l.text || ' '}</div>{/each}</pre>
 									{/if}
 								</div>
 							{/if}
@@ -180,20 +180,20 @@
 
 		{#if migration}
 			<section class="rounded-xl border border-border bg-card">
-				<button class="flex w-full items-center gap-2 px-3 py-2.5 text-left text-[13px]" onclick={() => (showSql = !showSql)} aria-expanded={showSql}>
+				<button class="flex w-full items-center gap-2 px-3 py-2.5 text-left text-[0.8125rem]" onclick={() => (showSql = !showSql)} aria-expanded={showSql}>
 					<ChevronRight class="size-3.5 text-muted-foreground transition-transform {showSql ? 'rotate-90' : ''}" />
 					<FileCode2 class="size-4 text-primary" />
 					<span class="font-medium">Draft migration SQL</span>
 					<span class="badge badge-warning">best-effort</span>
-					<span class="ml-auto text-[11px] text-muted-foreground">from {sideLabel(from)} to {sideLabel(to)}</span>
+					<span class="ml-auto text-[0.6875rem] text-muted-foreground">from {sideLabel(from)} to {sideLabel(to)}</span>
 				</button>
 				{#if showSql}
 					<div class="border-t border-border p-3">
-						<p class="mb-2 text-[11px] text-muted-foreground">
+						<p class="mb-2 text-[0.6875rem] text-muted-foreground">
 							Covers simple cases only (new tables, added/dropped columns, nullability, defaults, indexes). Drops are commented out; anything else is listed for you to
 							handle by hand. Review it before running — nothing here runs automatically.
 						</p>
-						<pre class="max-h-96 overflow-auto rounded-lg border border-border bg-background p-3 font-mono text-[11.5px] leading-[1.55]">{migration}</pre>
+						<pre class="max-h-96 overflow-auto rounded-lg border border-border bg-background p-3 font-mono text-[0.71875rem] leading-[1.55]">{migration}</pre>
 						<div class="mt-2 flex justify-end gap-1.5">
 							<button class="btn btn-secondary btn-sm" onclick={() => download('migration.sql', migration!, 'application/sql')}><Download />Download</button>
 							<button class="btn btn-secondary btn-sm" onclick={copySql}><Copy />Copy</button>

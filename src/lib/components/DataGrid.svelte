@@ -145,7 +145,7 @@
 	tabindex="0"
 	role="grid"
 	aria-rowcount={rows.length}
-	class="relative h-full overflow-auto font-mono text-[12px] outline-none"
+	class="relative h-full overflow-auto font-mono text-xs outline-none"
 >
 	<div style="width:{totalWidth}px; min-width:100%; height:{HEADER_H + rows.length * ROW_H}px" class="relative">
 		<div
@@ -162,8 +162,8 @@
 						title="{f.name} · {f.type}"
 					>
 						{#if primaryKeys.includes(f.name)}<KeyRound class="size-3 shrink-0 text-warning" />{/if}
-						<span class="truncate text-[12px] font-semibold text-foreground">{f.name}</span>
-						<span class="truncate font-mono text-[10px] font-normal text-muted-foreground/80">{f.type}</span>
+						<span class="truncate text-xs font-semibold text-foreground">{f.name}</span>
+						<span class="truncate font-mono text-[0.625rem] font-normal text-muted-foreground/80">{f.type}</span>
 						{#if sort?.column === f.name}
 							{#if sort.dir === 'asc'}<ArrowUp class="ml-auto size-3 shrink-0 text-primary" />{:else}<ArrowDown class="ml-auto size-3 shrink-0 text-primary" />{/if}
 						{/if}
@@ -185,7 +185,7 @@
 				>
 					{#if oncheck}
 						<button
-							class="sticky left-0 z-[1] flex items-center justify-end border-r border-border pr-2.5 text-[11px] tabular-nums {checked?.has(r)
+							class="sticky left-0 z-[1] flex items-center justify-end border-r border-border pr-2.5 text-[0.6875rem] tabular-nums {checked?.has(r)
 								? 'bg-primary text-primary-foreground'
 								: rs === 'new'
 									? 'bg-surface font-semibold text-success hover:bg-accent'
@@ -197,7 +197,7 @@
 							{rs === 'new' ? 'new' : offset + r + 1}
 						</button>
 					{:else}
-						<div class="sticky left-0 flex items-center justify-end border-r border-border bg-surface pr-2.5 text-[11px] text-muted-foreground/70 tabular-nums">
+						<div class="sticky left-0 flex items-center justify-end border-r border-border bg-surface pr-2.5 text-[0.6875rem] text-muted-foreground/70 tabular-nums">
 							{offset + r + 1}
 						</div>
 					{/if}
@@ -216,9 +216,9 @@
 								{@render editor(r, c)}
 							{/if}
 							{#if cs === 'default'}
-								<span class="text-[11px] text-muted-foreground/60 italic">DEFAULT</span>
+								<span class="text-[0.6875rem] text-muted-foreground/60 italic">DEFAULT</span>
 							{:else if value === null || value === undefined}
-								<span class="text-[11px] text-muted-foreground/50 italic">NULL</span>
+								<span class="text-[0.6875rem] text-muted-foreground/50 italic">NULL</span>
 							{:else if typeof value === 'boolean'}
 								<span class={value ? 'text-success' : 'text-muted-foreground'}>{value}</span>
 							{:else if typeof value === 'object'}

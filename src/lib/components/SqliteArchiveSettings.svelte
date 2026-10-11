@@ -28,7 +28,7 @@
 <section id="sqlite" class="card scroll-mt-6 p-5">
 	<div class="flex items-start gap-4">
 		<div class="min-w-0 flex-1">
-			<h2 class="flex items-center gap-2 text-[14px] font-semibold"><Database class="size-4 text-primary" />SQLite in containers</h2>
+			<h2 class="flex items-center gap-2 text-sm font-semibold"><Database class="size-4 text-primary" />SQLite in containers</h2>
 			<p class="mt-1 text-xs text-muted-foreground">
 				SQLite files in scan folders, and in container bind mounts that pg·modern can also see, are always found and opened in place. Turn this on to
 				also find databases inside container volumes pg·modern can’t see, and browse read-only snapshots of them.
@@ -47,7 +47,7 @@
 	</div>
 
 	<div class="mt-4 grid gap-4 lg:grid-cols-[1fr_16rem]">
-		<div class="rounded-lg border border-warning/30 bg-warning/5 p-3 text-[11px] text-muted-foreground">
+		<div class="rounded-lg border border-warning/30 bg-warning/5 p-3 text-[0.6875rem] text-muted-foreground">
 			<p class="flex items-center gap-1.5 font-medium text-foreground"><ShieldAlert class="size-3.5 text-warning" />What this allows</p>
 			<ul class="mt-1.5 list-disc space-y-1 pl-4">
 				<li>
@@ -75,7 +75,7 @@
 					<input id="sqlite-max" class="input h-8 font-mono text-xs" type="number" min="1" max="65536" bind:value={maxMb} />
 					<button class="btn btn-secondary" disabled={Number(maxMb) === view.sqliteSnapshotMaxMb}>Save</button>
 				</div>
-				<p class="mt-1 text-[11px] text-muted-foreground">Database plus its -wal. Larger ones are listed but can’t be imported.</p>
+				<p class="mt-1 text-[0.6875rem] text-muted-foreground">Database plus its -wal. Larger ones are listed but can’t be imported.</p>
 			</form>
 		{/if}
 	</div>

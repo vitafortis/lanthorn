@@ -112,8 +112,8 @@
 						<input type="radio" class="sr-only" name="sq-scope" value={o.value} bind:group={scope} />
 						<o.icon class="mt-0.5 size-4 shrink-0 {scope === o.value ? 'text-primary' : 'text-muted-foreground'}" />
 						<span class="min-w-0">
-							<span class="block text-[13px] font-medium">{o.title}</span>
-							<span class="block truncate text-[11px] text-muted-foreground">{o.body}</span>
+							<span class="block text-[0.8125rem] font-medium">{o.title}</span>
+							<span class="block truncate text-[0.6875rem] text-muted-foreground">{o.body}</span>
 						</span>
 					</label>
 				{/each}
@@ -123,8 +123,8 @@
 			<div class="flex gap-2.5">
 				<Users class="mt-0.5 size-4 shrink-0 text-muted-foreground" />
 				<div>
-					<p class="text-[13px] font-medium">Share with others</p>
-					<p class="mt-0.5 text-[11px] text-muted-foreground">
+					<p class="text-[0.8125rem] font-medium">Share with others</p>
+					<p class="mt-0.5 text-[0.6875rem] text-muted-foreground">
 						Everyone who can see {scope === 'connection' ? connectionName : 'a connection'} can find and run it. Only you and admins can change it.
 					</p>
 				</div>

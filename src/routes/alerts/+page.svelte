@@ -399,16 +399,16 @@
 			<div class="inline-flex rounded-xl border border-border bg-surface p-1">
 				{#each TABS as t (t.key)}
 					<button
-						class="flex h-8 items-center gap-1.5 rounded-lg px-3 text-[13px] {tab === t.key ? 'bg-card text-foreground shadow-surface' : 'text-muted-foreground'}"
+						class="flex h-8 items-center gap-1.5 rounded-lg px-3 text-[0.8125rem] {tab === t.key ? 'bg-card text-foreground shadow-surface' : 'text-muted-foreground'}"
 						onclick={() => (tab = t.key)}
 					>
 						<t.icon class="size-3.5" />{t.label}
-						{#if t.key === 'active' && overview?.active.length}<span class="rounded-full bg-danger/15 px-1.5 text-[10px] font-semibold text-danger">{overview.active.length}</span>{/if}
+						{#if t.key === 'active' && overview?.active.length}<span class="rounded-full bg-danger/15 px-1.5 text-[0.625rem] font-semibold text-danger">{overview.active.length}</span>{/if}
 					</button>
 				{/each}
 			</div>
 			{#if alertJob}
-				<span class="text-[11px] text-muted-foreground">
+				<span class="text-[0.6875rem] text-muted-foreground">
 					Last check {ago(alertJob.lastFinishedAt)}{#if alertJob.lastError} · <span class="text-danger">{alertJob.lastError}</span>{/if}
 					{#if sizeJob} · size sample {ago(sizeJob.lastFinishedAt)}{/if}
 				</span>
@@ -419,7 +419,7 @@
 			<div class="grid h-40 place-items-center"><LoaderCircle class="size-5 animate-spin text-muted-foreground" /></div>
 		{:else if tab === 'active'}
 			{#if !channels.length}
-				<div class="flex items-start gap-3 rounded-xl border border-warning/30 bg-warning/5 p-4 text-[13px]">
+				<div class="flex items-start gap-3 rounded-xl border border-warning/30 bg-warning/5 p-4 text-[0.8125rem]">
 					<TriangleAlert class="mt-0.5 size-4 shrink-0 text-warning" />
 					<div>
 						<p class="font-medium">No notification channel yet</p>
@@ -431,32 +431,32 @@
 			{/if}
 
 			<section class="space-y-2">
-				<h2 class="text-[13px] font-semibold">Firing now</h2>
+				<h2 class="text-[0.8125rem] font-semibold">Firing now</h2>
 				{#each overview.active as a (a.ruleId + a.connectionId)}
 					<div class="card flex items-start gap-3 p-3.5">
 						<div class="grid size-8 shrink-0 place-items-center rounded-lg {a.severity === 'critical' ? 'bg-danger/10 text-danger' : 'bg-warning/10 text-warning'}">
 							<BellRing class="size-4" />
 						</div>
 						<div class="min-w-0 flex-1">
-							<div class="flex flex-wrap items-center gap-2 text-[13px]">
+							<div class="flex flex-wrap items-center gap-2 text-[0.8125rem]">
 								<span class="font-semibold">{RULES[a.ruleKind].label}</span>
 								<span class="badge {a.severity === 'critical' ? 'badge-danger' : 'badge-warning'}">{a.severity}</span>
 								<a class="text-muted-foreground hover:text-primary" href="/c/{a.connectionId}">{a.connectionName}</a>
-								<span class="ml-auto text-[11px] text-muted-foreground" title={new Date(a.since).toLocaleString()}>since {ago(a.since)}</span>
+								<span class="ml-auto text-[0.6875rem] text-muted-foreground" title={new Date(a.since).toLocaleString()}>since {ago(a.since)}</span>
 							</div>
 							<p class="mt-1 text-xs break-words text-muted-foreground">{a.message}</p>
 						</div>
 					</div>
 				{:else}
-					<div class="card flex items-center gap-2 p-4 text-[13px] text-muted-foreground"><CircleCheck class="size-4 text-success" />All clear — nothing is firing.</div>
+					<div class="card flex items-center gap-2 p-4 text-[0.8125rem] text-muted-foreground"><CircleCheck class="size-4 text-success" />All clear — nothing is firing.</div>
 				{/each}
 			</section>
 
 			<section class="space-y-2">
-				<h2 class="text-[13px] font-semibold">History</h2>
+				<h2 class="text-[0.8125rem] font-semibold">History</h2>
 				<div class="card overflow-hidden">
-					<table class="w-full table-fixed text-left text-[13px]">
-						<thead class="border-b border-border bg-surface text-[11px] text-muted-foreground">
+					<table class="w-full table-fixed text-left text-[0.8125rem]">
+						<thead class="border-b border-border bg-surface text-[0.6875rem] text-muted-foreground">
 							<tr>
 								<th class="w-32 px-4 py-2 font-medium">When</th>
 								<th class="w-28 px-4 py-2 font-medium">Event</th>
@@ -475,13 +475,13 @@
 									<td class="px-4 py-2.5 text-xs">
 										<p>{RULES[e.ruleKind]?.label ?? e.ruleKind}</p>
 										{#if e.connectionName}
-											<p class="truncate text-[11px] text-muted-foreground">
+											<p class="truncate text-[0.6875rem] text-muted-foreground">
 												{#if connections.list.some((c) => c.id === e.connectionId)}<a class="hover:text-primary" href="/c/{e.connectionId}">{e.connectionName}</a>{:else}{e.connectionName}{/if}
 											</p>
 										{/if}
 									</td>
 									<td class="px-4 py-2.5 text-xs break-words text-muted-foreground">{e.message}</td>
-									<td class="px-4 py-2.5 text-right text-[11px] text-muted-foreground">
+									<td class="px-4 py-2.5 text-right text-[0.6875rem] text-muted-foreground">
 										{#if e.error}<span class="text-danger" title={e.error}><CircleAlert class="inline size-3" /> {e.delivered} sent, failed</span>
 										{:else if e.delivered}<span><CircleCheck class="inline size-3 text-success" /> {e.delivered} sent</span>
 										{:else}—{/if}
@@ -513,8 +513,8 @@
 			</form>
 
 			<div class="card overflow-hidden">
-				<table class="w-full text-left text-[13px]">
-					<thead class="border-b border-border bg-surface text-[11px] text-muted-foreground">
+				<table class="w-full text-left text-[0.8125rem]">
+					<thead class="border-b border-border bg-surface text-[0.6875rem] text-muted-foreground">
 						<tr>
 							<th class="px-4 py-2 font-medium">Rule</th>
 							<th class="w-44 px-4 py-2 font-medium">Applies to</th>
@@ -534,10 +534,10 @@
 										<span class="badge {def.severity === 'critical' ? 'badge-danger' : 'badge-warning'}">{def.severity}</span>
 										{#if def.postgresOnly}<span class="badge">Postgres</span>{/if}
 									</p>
-									<p class="mt-0.5 text-[11px] text-muted-foreground">{def.description}</p>
+									<p class="mt-0.5 text-[0.6875rem] text-muted-foreground">{def.description}</p>
 								</td>
 								<td class="px-4 py-3 text-xs">
-									{#if r.connectionId}{connName(r.connectionId)}<p class="text-[11px] text-muted-foreground">overrides the global rule</p>{:else}All connections{/if}
+									{#if r.connectionId}{connName(r.connectionId)}<p class="text-[0.6875rem] text-muted-foreground">overrides the global rule</p>{:else}All connections{/if}
 								</td>
 								<td class="px-4 py-3">
 									{#each def.params as p (p.key)}
@@ -579,13 +579,13 @@
 					{/if}
 				</div>
 			</div>
-			<p class="text-[11px] text-muted-foreground">
+			<p class="text-[0.6875rem] text-muted-foreground">
 				A rule for one connection replaces the all-connections rule of the same kind there; disable it to turn that check off for just that connection.
 				Checks run read-only with short timeouts, one session per database.
 			</p>
 		{:else if tab === 'channels'}
 			<div class="flex flex-wrap items-center gap-3">
-				<p class="text-[11px] text-muted-foreground">Each channel decides which alerts it wants, when to stay quiet, and how often it may be notified. Secrets are stored encrypted and never shown again.</p>
+				<p class="text-[0.6875rem] text-muted-foreground">Each channel decides which alerts it wants, when to stay quiet, and how often it may be notified. Secrets are stored encrypted and never shown again.</p>
 				<button class="btn btn-primary ml-auto" onclick={() => openChannel()}><Plus />Add channel</button>
 			</div>
 			<div class="grid gap-3 md:grid-cols-2 2xl:grid-cols-3">
@@ -596,12 +596,12 @@
 						<div class="flex items-start gap-3">
 							<div class="grid size-9 shrink-0 place-items-center rounded-lg bg-primary-soft text-primary"><Icon class="size-4" /></div>
 							<div class="min-w-0 flex-1">
-								<p class="truncate text-[14px] font-semibold">{c.name}</p>
+								<p class="truncate text-sm font-semibold">{c.name}</p>
 								<p class="text-xs text-muted-foreground">{CHANNELS[c.kind].label}</p>
 							</div>
 							<Switch label="Enabled" checked={c.enabled} onchange={(v) => toggleChannel(c, v)} />
 						</div>
-						<dl class="mt-3 space-y-1 text-[11px]">
+						<dl class="mt-3 space-y-1 text-[0.6875rem]">
 							{#each CHANNELS[c.kind].fields as f (f.key)}
 								{#if fieldVisible(f, c.config, c.kind) && (f.secret ? c.secrets[f.key] : c.config[f.key])}
 									<div class="flex gap-2">
@@ -611,19 +611,19 @@
 								{/if}
 							{/each}
 						</dl>
-						<div class="mt-3 flex flex-wrap gap-1.5 text-[11px]">
+						<div class="mt-3 flex flex-wrap gap-1.5 text-[0.6875rem]">
 							<span class="badge"><Route class="size-3" />{routing(c.options).join(' · ')}</span>
 							{#if c.options.quietHours.enabled}
 								<span class="badge"><Moon class="size-3" />Quiet {c.options.quietHours.start}–{c.options.quietHours.end}{c.options.quietHours.allowCritical ? ', critical still sent' : ''}</span>
 							{/if}
 							<span class="badge"><Gauge class="size-3" />{limits(c.options)}</span>
 						</div>
-						<p class="mt-3 text-[11px] break-words {c.lastError ? 'text-danger' : 'text-muted-foreground'}">
+						<p class="mt-3 text-[0.6875rem] break-words {c.lastError ? 'text-danger' : 'text-muted-foreground'}">
 							{#if c.lastError}Last delivery failed: {c.lastError}{:else if c.lastSentAt}Last sent {ago(c.lastSentAt)}{:else}Nothing sent yet{/if}
 						</p>
 						{#if result}
 							<div
-								class="mt-2 rounded-lg border px-2.5 py-2 text-[11px] {result.ok ? 'border-success/30 bg-success/5 text-success' : 'border-danger/30 bg-danger/5 text-danger'}"
+								class="mt-2 rounded-lg border px-2.5 py-2 text-[0.6875rem] {result.ok ? 'border-success/30 bg-success/5 text-success' : 'border-danger/30 bg-danger/5 text-danger'}"
 								role="status"
 							>
 								{#if result.ok}
@@ -644,7 +644,7 @@
 						</div>
 					</div>
 				{:else}
-					<div class="card col-span-full flex flex-col items-center gap-3 px-6 py-12 text-center text-[13px] text-muted-foreground">
+					<div class="card col-span-full flex flex-col items-center gap-3 px-6 py-12 text-center text-[0.8125rem] text-muted-foreground">
 						<div class="grid size-10 place-items-center rounded-xl bg-primary-soft text-primary"><Webhook class="size-5" /></div>
 						<p>No channels yet. Alerts are still recorded in the history; add a channel to be notified.</p>
 						<button class="btn btn-primary" onclick={() => openChannel()}><Plus />Add channel</button>
@@ -658,11 +658,11 @@
 					{#each channels as c (c.id)}<option value={c.id}>{c.name}</option>{/each}
 				</select>
 				<button class="btn btn-ghost btn-sm" onclick={() => loadDeliveries()}><RefreshCw />Refresh</button>
-				<p class="ml-auto text-[11px] text-muted-foreground">Every attempt to notify a channel, including tests and alerts a channel held back. The last 5,000 are kept.</p>
+				<p class="ml-auto text-[0.6875rem] text-muted-foreground">Every attempt to notify a channel, including tests and alerts a channel held back. The last 5,000 are kept.</p>
 			</div>
 			<div class="card overflow-x-auto">
-				<table class="w-full min-w-[720px] table-fixed text-left text-[13px]">
-					<thead class="border-b border-border bg-surface text-[11px] text-muted-foreground">
+				<table class="w-full min-w-[720px] table-fixed text-left text-[0.8125rem]">
+					<thead class="border-b border-border bg-surface text-[0.6875rem] text-muted-foreground">
 						<tr>
 							<th class="w-32 px-4 py-2 font-medium">When</th>
 							<th class="w-44 px-4 py-2 font-medium">Channel</th>
@@ -678,21 +678,21 @@
 								<td class="px-4 py-2.5 text-xs text-muted-foreground" title={new Date(d.at).toLocaleString()}>{ago(d.at)}</td>
 								<td class="px-4 py-2.5 text-xs">
 									<p class="flex items-center gap-1.5 truncate"><Icon class="size-3.5 shrink-0 text-muted-foreground" />{d.channelName}</p>
-									<p class="text-[11px] text-muted-foreground">{CHANNELS[d.channelKind]?.label ?? d.channelKind}</p>
+									<p class="text-[0.6875rem] text-muted-foreground">{CHANNELS[d.channelKind]?.label ?? d.channelKind}</p>
 								</td>
 								<td class="px-4 py-2.5 text-xs">
 									<p class="truncate">
 										<span class="text-muted-foreground">{DEVENT_LABEL[d.event] ?? d.event} ·</span>
 										{d.title}
 									</p>
-									{#if d.connectionName}<p class="truncate text-[11px] text-muted-foreground">{d.connectionName}</p>{/if}
+									{#if d.connectionName}<p class="truncate text-[0.6875rem] text-muted-foreground">{d.connectionName}</p>{/if}
 								</td>
 								<td class="px-4 py-2.5 text-xs">
 									<span class="badge {DELIVERY_BADGE[d.status]}">{DELIVERY_LABEL[d.status]}</span>
-									{#if d.event !== 'test' && d.severity === 'critical'}<p class="mt-1 text-[11px] text-danger">critical</p>{/if}
+									{#if d.event !== 'test' && d.severity === 'critical'}<p class="mt-1 text-[0.6875rem] text-danger">critical</p>{/if}
 								</td>
 								<td class="px-4 py-2.5 text-xs break-words {d.status === 'failed' ? 'font-mono text-danger' : 'text-muted-foreground'}">
-									{d.detail ?? (d.status === 'sent' ? 'Delivered' : '—')}{#if d.durationMs != null}<span class="ml-1 font-sans text-[11px] text-muted-foreground">· {d.durationMs} ms</span>{/if}
+									{d.detail ?? (d.status === 'sent' ? 'Delivered' : '—')}{#if d.durationMs != null}<span class="ml-1 font-sans text-[0.6875rem] text-muted-foreground">· {d.durationMs} ms</span>{/if}
 								</td>
 							</tr>
 						{:else}
@@ -750,7 +750,7 @@
 										bind:value={form.secrets[f.key]}
 									/>
 									{#if stored && !f.required}
-										<span class="mt-1 flex items-center gap-2 text-[11px] text-muted-foreground">
+										<span class="mt-1 flex items-center gap-2 text-[0.6875rem] text-muted-foreground">
 											<input
 												type="checkbox"
 												checked={form.clear.includes(f.key)}
@@ -771,21 +771,21 @@
 										bind:value={form.config[f.key]}
 									/>
 								{/if}
-								{#if f.help}<span class="mt-1 block text-[11px] text-muted-foreground">{f.help}</span>{/if}
+								{#if f.help}<span class="mt-1 block text-[0.6875rem] text-muted-foreground">{f.help}</span>{/if}
 							</label>
 						{/if}
 					{/each}
 				</div>
 				{#if form.kind === 'webhook' || (form.kind === 'homeassistant' && (form.config.mode ?? 'webhook') === 'webhook')}
-					<p class="text-[11px] text-muted-foreground">
+					<p class="text-[0.6875rem] text-muted-foreground">
 						POSTs JSON: <code class="font-mono">{'{ source, version, event, severity, status, title, alert, message, rule, connection, value, since, at, url }'}</code> — see the README.
 					</p>
 				{/if}
-				<label class="flex items-center gap-2 text-[13px]"><Switch label="Enabled" bind:checked={form.enabled} />Enabled</label>
+				<label class="flex items-center gap-2 text-[0.8125rem]"><Switch label="Enabled" bind:checked={form.enabled} />Enabled</label>
 			{:else}
 				{@const o = form.options}
 				<section class="space-y-3">
-					<h3 class="flex items-center gap-1.5 text-[13px] font-semibold"><Route class="size-3.5 text-muted-foreground" />Which alerts</h3>
+					<h3 class="flex items-center gap-1.5 text-[0.8125rem] font-semibold"><Route class="size-3.5 text-muted-foreground" />Which alerts</h3>
 					<div class="grid gap-3 sm:grid-cols-2">
 						<label class="block">
 							<span class="label">Severity</span>
@@ -794,7 +794,7 @@
 								<option value="critical">Critical only</option>
 							</select>
 						</label>
-						<div class="flex flex-col justify-end gap-2 pb-1 text-[13px]">
+						<div class="flex flex-col justify-end gap-2 pb-1 text-[0.8125rem]">
 							<label class="flex items-center gap-2"><Switch label="Send recoveries" bind:checked={o.sendResolved} />Send “resolved”</label>
 							<label class="flex items-center gap-2"><Switch label="Send reminders" bind:checked={o.sendRenotify} />Send “still firing” reminders</label>
 						</div>
@@ -815,7 +815,7 @@
 								{@const on = o.connectionIds.includes(c.id)}
 								<button type="button" aria-pressed={on} class="badge cursor-pointer {on ? 'badge-primary' : ''}" onclick={() => (o.connectionIds = toggleIn(o.connectionIds, c.id))}>{c.name}</button>
 							{:else}
-								<span class="text-[11px] text-muted-foreground">No connections yet.</span>
+								<span class="text-[0.6875rem] text-muted-foreground">No connections yet.</span>
 							{/each}
 						</div>
 					</div>
@@ -823,7 +823,7 @@
 
 				<section class="space-y-3 border-t border-border pt-4">
 					<div class="flex items-center gap-2">
-						<h3 class="flex items-center gap-1.5 text-[13px] font-semibold"><Moon class="size-3.5 text-muted-foreground" />Quiet hours</h3>
+						<h3 class="flex items-center gap-1.5 text-[0.8125rem] font-semibold"><Moon class="size-3.5 text-muted-foreground" />Quiet hours</h3>
 						<span class="ml-auto"><Switch label="Quiet hours" bind:checked={o.quietHours.enabled} /></span>
 					</div>
 					{#if o.quietHours.enabled}
@@ -836,24 +836,24 @@
 								<datalist id="alert-zones">{#each ZONES as z (z)}<option value={z}></option>{/each}</datalist>
 							</label>
 						</div>
-						<label class="flex items-center gap-2 text-[13px]"><Switch label="Still send critical" bind:checked={o.quietHours.allowCritical} />Still send critical alerts (and their recovery)</label>
+						<label class="flex items-center gap-2 text-[0.8125rem]"><Switch label="Still send critical" bind:checked={o.quietHours.allowCritical} />Still send critical alerts (and their recovery)</label>
 					{:else}
-						<p class="text-[11px] text-muted-foreground">Hold back notifications overnight or during work hours; they still show in the history and the delivery log.</p>
+						<p class="text-[0.6875rem] text-muted-foreground">Hold back notifications overnight or during work hours; they still show in the history and the delivery log.</p>
 					{/if}
 				</section>
 
 				<section class="space-y-3 border-t border-border pt-4">
-					<h3 class="flex items-center gap-1.5 text-[13px] font-semibold"><Clock class="size-3.5 text-muted-foreground" />Limits</h3>
+					<h3 class="flex items-center gap-1.5 text-[0.8125rem] font-semibold"><Clock class="size-3.5 text-muted-foreground" />Limits</h3>
 					<div class="grid gap-3 sm:grid-cols-2">
 						<label class="block">
 							<span class="label">At most per hour (0 = no limit)</span>
 							<input class="input font-mono" type="number" min="0" max="10000" bind:value={o.maxPerHour} />
-							<span class="mt-1 block text-[11px] text-muted-foreground">A newly firing critical alert always goes through.</span>
+							<span class="mt-1 block text-[0.6875rem] text-muted-foreground">A newly firing critical alert always goes through.</span>
 						</label>
 						<label class="block">
 							<span class="label">Drop repeats within (minutes, 0 = off)</span>
 							<input class="input font-mono" type="number" min="0" max="10080" bind:value={o.dedupeMinutes} />
-							<span class="mt-1 block text-[11px] text-muted-foreground">The same alert event on the same connection, e.g. a flapping check.</span>
+							<span class="mt-1 block text-[0.6875rem] text-muted-foreground">The same alert event on the same connection, e.g. a flapping check.</span>
 						</label>
 					</div>
 				</section>

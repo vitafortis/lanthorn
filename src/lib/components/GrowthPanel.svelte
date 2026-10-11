@@ -87,14 +87,14 @@
 
 <section class="card p-4">
 	<div class="mb-3 flex flex-wrap items-center gap-2">
-		<h3 class="flex items-center gap-2 text-[13px] font-semibold"><TrendingUp class="size-4 text-primary" />Growth</h3>
+		<h3 class="flex items-center gap-2 text-[0.8125rem] font-semibold"><TrendingUp class="size-4 text-primary" />Growth</h3>
 		{#if change != null}
-			<span class="text-[11px] text-muted-foreground tabular-nums">
+			<span class="text-[0.6875rem] text-muted-foreground tabular-nums">
 				{signed(change)}{#if changePct != null}{' '}({changePct >= 0 ? '+' : ''}{changePct.toFixed(1)}%){/if} over {range === '1y' ? 'the year' : range}
 			</span>
 		{/if}
 		<div class="ml-auto flex items-center gap-2">
-			{#if data?.lastSampleAt}<span class="text-[11px] text-muted-foreground">sampled {ago(new Date(data.lastSampleAt).toISOString())}</span>{/if}
+			{#if data?.lastSampleAt}<span class="text-[0.6875rem] text-muted-foreground">sampled {ago(new Date(data.lastSampleAt).toISOString())}</span>{/if}
 			{#if isAdmin()}
 				<button class="btn btn-ghost btn-sm" title="Sample sizes now" disabled={sampling} onclick={sampleNow}>
 					{#if sampling}<LoaderCircle class="animate-spin" />{:else}<RefreshCw />{/if}Sample
@@ -105,7 +105,7 @@
 					<button
 						role="tab"
 						aria-selected={range === r}
-						class="h-6 rounded-md px-2 text-[11px] font-medium {range === r ? 'bg-card text-foreground shadow-surface' : 'text-muted-foreground hover:text-foreground'}"
+						class="h-6 rounded-md px-2 text-[0.6875rem] font-medium {range === r ? 'bg-card text-foreground shadow-surface' : 'text-muted-foreground hover:text-foreground'}"
 						onclick={() => (range = r)}>{r}</button
 					>
 				{/each}
@@ -141,10 +141,10 @@
 					</defs>
 					{#each yTicks as t, i (i)}
 						<line x1={PAD.left} x2={W - PAD.right} y1={y(t)} y2={y(t)} stroke="var(--border)" stroke-dasharray={i ? '2 3' : undefined} />
-						<text x={PAD.left - 8} y={y(t)} dy="0.32em" text-anchor="end" class="fill-muted-foreground text-[10px] tabular-nums">{bytes(t)}</text>
+						<text x={PAD.left - 8} y={y(t)} dy="0.32em" text-anchor="end" class="fill-muted-foreground text-[0.625rem] tabular-nums">{bytes(t)}</text>
 					{/each}
 					{#each xTicks as t, i (i)}
-						<text x={x(t)} y={H - 6} text-anchor={i === 0 ? 'start' : i === xTicks.length - 1 ? 'end' : 'middle'} class="fill-muted-foreground text-[10px]">{dateFmt(t)}</text>
+						<text x={x(t)} y={H - 6} text-anchor={i === 0 ? 'start' : i === xTicks.length - 1 ? 'end' : 'middle'} class="fill-muted-foreground text-[0.625rem]">{dateFmt(t)}</text>
 					{/each}
 					<path d={area} fill="url(#growth-fill-{connectionId})" />
 					<path d={line} fill="none" stroke="var(--primary)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke" />
@@ -155,7 +155,7 @@
 				</svg>
 				{#if hover}
 					<div
-						class="pointer-events-none absolute top-0 z-10 rounded-lg border border-border bg-card px-2.5 py-1.5 text-[11px] shadow-surface-lg whitespace-nowrap"
+						class="pointer-events-none absolute top-0 z-10 rounded-lg border border-border bg-card px-2.5 py-1.5 text-[0.6875rem] shadow-surface-lg whitespace-nowrap"
 						style="left:{tipLeft}%; transform: translateX({tipLeft > 60 ? 'calc(-100% - 10px)' : '10px'})"
 					>
 						<p class="font-semibold tabular-nums">{bytes(hover.bytes)}</p>
@@ -167,7 +167,7 @@
 			</div>
 
 			<div>
-				<p class="mb-1.5 text-[11px] font-medium text-muted-foreground">Fastest-growing tables ({range})</p>
+				<p class="mb-1.5 text-[0.6875rem] font-medium text-muted-foreground">Fastest-growing tables ({range})</p>
 				<div class="space-y-0.5">
 					{#each data.tables.filter((t) => t.delta !== 0).slice(0, 8) as t (t.schema + '.' + t.name)}
 						<button
@@ -178,8 +178,8 @@
 							<div class="absolute inset-y-0 left-0 rounded-md {t.delta >= 0 ? 'bg-primary-soft' : 'bg-muted'}" style="width:{(Math.abs(t.delta) / maxDelta) * 100}%"></div>
 							<div class="relative flex items-center gap-2 text-xs">
 								<span class="min-w-0 truncate font-mono"><span class="text-muted-foreground">{t.schema}.</span>{t.name}</span>
-								<span class="ml-auto text-[11px] text-muted-foreground tabular-nums">{bytes(t.bytes)}</span>
-								<span class="w-24 text-right text-[11px] font-medium tabular-nums">
+								<span class="ml-auto text-[0.6875rem] text-muted-foreground tabular-nums">{bytes(t.bytes)}</span>
+								<span class="w-24 text-right text-[0.6875rem] font-medium tabular-nums">
 									{signed(t.delta)}{#if t.deltaPct != null}<span class="ml-1 font-normal text-muted-foreground">{t.deltaPct >= 0 ? '+' : ''}{Math.round(t.deltaPct)}%</span>{:else}<span class="ml-1 font-normal text-muted-foreground">new</span>{/if}
 								</span>
 							</div>

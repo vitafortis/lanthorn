@@ -62,7 +62,7 @@
 			<div class="mb-6 flex flex-col items-center text-center">
 				<Logo size={44} />
 				<h1 class="mt-4 text-lg font-semibold tracking-tight">Finish setting up your account</h1>
-				<p class="mt-1.5 text-[13px] text-muted-foreground">
+				<p class="mt-1.5 text-[0.8125rem] text-muted-foreground">
 					pg·modern now has user accounts. Your existing password was kept on the account
 					<code class="font-mono text-foreground">{data.user.email}</code> — add your name and email so you can sign in with them from now on.
 				</p>
@@ -72,7 +72,7 @@
 			<input id="a-name" class="input" autocomplete="name" autofocus bind:value={name} />
 			<label class="label mt-3" for="a-email">Email</label>
 			<input id="a-email" class="input" type="email" autocomplete="email" required bind:value={email} />
-			<p class="mt-1.5 text-[11px] text-muted-foreground">Also used to match your account if you turn on single sign-on later.</p>
+			<p class="mt-1.5 text-[0.6875rem] text-muted-foreground">Also used to match your account if you turn on single sign-on later.</p>
 			<details class="mt-4">
 				<summary class="cursor-pointer text-xs text-muted-foreground select-none hover:text-foreground">Change your password too</summary>
 				<div class="mt-3 space-y-3">
@@ -92,7 +92,7 @@
 		<PageHeader title="My account" description="Your profile and how you sign in." />
 		<form class="max-w-2xl space-y-5 px-8 pb-10" onsubmit={saveProfile}>
 			<section class="card p-5">
-				<h2 class="flex items-center gap-2 text-[14px] font-semibold"><UserRound class="size-4 text-primary" />Profile</h2>
+				<h2 class="flex items-center gap-2 text-sm font-semibold"><UserRound class="size-4 text-primary" />Profile</h2>
 				<div class="mt-4 grid gap-3 sm:grid-cols-2">
 					<div>
 						<label class="label" for="p-name">Name</label>
@@ -101,7 +101,7 @@
 					<div>
 						<label class="label" for="p-email">Email</label>
 						<input id="p-email" class="input" type="email" autocomplete="email" disabled={data.user.sso} bind:value={email} />
-						{#if data.user.sso}<p class="mt-1 text-[11px] text-muted-foreground">Managed by your identity provider.</p>{/if}
+						{#if data.user.sso}<p class="mt-1 text-[0.6875rem] text-muted-foreground">Managed by your identity provider.</p>{/if}
 					</div>
 				</div>
 				<div class="mt-4 flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground">
@@ -113,7 +113,7 @@
 			</section>
 
 			<section class="card p-5">
-				<h2 class="flex items-center gap-2 text-[14px] font-semibold"><Lock class="size-4 text-primary" />{data.user.hasPassword ? 'Change password' : 'Set a password'}</h2>
+				<h2 class="flex items-center gap-2 text-sm font-semibold"><Lock class="size-4 text-primary" />{data.user.hasPassword ? 'Change password' : 'Set a password'}</h2>
 				{#if !data.user.hasPassword}
 					<p class="mt-1 text-xs text-muted-foreground">Optional — lets you sign in without single sign-on.</p>
 				{/if}

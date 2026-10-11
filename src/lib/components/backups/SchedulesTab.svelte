@@ -148,14 +148,14 @@
 {#if !data.destinations.length}
 	<div class="card px-6 py-12 text-center">
 		<p class="text-sm font-medium">Add a destination first</p>
-		<p class="mt-1 text-[13px] text-muted-foreground">Schedules write to a folder, an SFTP server or an S3 bucket.</p>
+		<p class="mt-1 text-[0.8125rem] text-muted-foreground">Schedules write to a folder, an SFTP server or an S3 bucket.</p>
 		<button class="btn btn-primary mt-4" onclick={() => goto('destinations')}>Add a destination</button>
 	</div>
 {:else if !data.schedules.length}
 	<div class="card px-6 py-12 text-center">
 		<div class="mx-auto grid size-10 place-items-center rounded-xl bg-primary-soft text-primary"><CalendarClock class="size-5" /></div>
 		<p class="mt-3 text-sm font-medium">No schedules yet</p>
-		<p class="mt-1 text-[13px] text-muted-foreground">Back up one connection or all of them hourly, daily or weekly, and keep the last few.</p>
+		<p class="mt-1 text-[0.8125rem] text-muted-foreground">Back up one connection or all of them hourly, daily or weekly, and keep the last few.</p>
 	</div>
 {:else}
 	<div class="card divide-y divide-border">
@@ -164,7 +164,7 @@
 			<div class="flex flex-wrap items-center gap-4 px-4 py-3">
 				<Switch checked={s.enabled} label="Enabled" onchange={(v) => toggle(s, v)} />
 				<div class="min-w-0 flex-1">
-					<p class="truncate text-[13px] font-medium">{s.name} <span class="font-normal text-muted-foreground">· {connName(s.connectionId)} → {destName(s.destinationId)}</span></p>
+					<p class="truncate text-[0.8125rem] font-medium">{s.name} <span class="font-normal text-muted-foreground">· {connName(s.connectionId)} → {destName(s.destinationId)}</span></p>
 					<p class="mt-0.5 text-xs text-muted-foreground">
 						{describeTiming(s)} · {describeRetention(s)}{s.compress ? '' : ' · uncompressed'}
 					</p>
@@ -262,13 +262,13 @@
 		</p>
 		<div class="flex items-center justify-between gap-3 border-t border-border pt-3">
 			<div>
-				<p class="text-[13px]">Compress</p>
+				<p class="text-[0.8125rem]">Compress</p>
 				<p class="text-xs text-muted-foreground">gzip for MySQL/MariaDB; Postgres custom-format dumps are compressed by pg_dump.</p>
 			</div>
 			<Switch bind:checked={form.compress} label="Compress" />
 		</div>
 		<div class="flex items-center justify-between gap-3">
-			<p class="text-[13px]">Enabled</p>
+			<p class="text-[0.8125rem]">Enabled</p>
 			<Switch bind:checked={form.enabled} label="Enabled" />
 		</div>
 	</form>
