@@ -103,7 +103,18 @@ export interface AlertRule {
 	updatedAt: string;
 }
 
-export type ChannelKind = 'ntfy' | 'gotify' | 'discord' | 'slack' | 'webhook' | 'apprise';
+export type ChannelKind =
+	| 'slack'
+	| 'discord'
+	| 'telegram'
+	| 'pushover'
+	| 'gotify'
+	| 'ntfy'
+	| 'matrix'
+	| 'email'
+	| 'homeassistant'
+	| 'webhook'
+	| 'apprise';
 
 export interface ChannelField {
 	key: string;
@@ -113,43 +124,143 @@ export interface ChannelField {
 	secret?: boolean;
 	required?: boolean;
 	help?: string;
+	/** How the value is checked and edited; text when absent. */
+	type?: 'text' | 'url' | 'number' | 'select' | 'emails';
+	options?: { value: string; label: string }[];
+	/** Prefilled for a new channel. */
+	default?: string;
+	/** Only shown (and required) when another config field has one of these values. */
+	showIf?: { key: string; values: string[] };
 }
 
-export const CHANNEL_KINDS: ChannelKind[] = ['ntfy', 'gotify', 'discord', 'slack', 'webhook', 'apprise'];
+export const CHANNEL_KINDS: ChannelKind[] = ['slack', 'discord', 'telegram', 'pushover', 'gotify', 'ntfy', 'matrix', 'email', 'homeassistant', 'webhook', 'apprise'];
 
 export const CHANNELS: Record<ChannelKind, { label: string; description: string; fields: ChannelField[] }> = {
-	ntfy: {
-		label: 'ntfy',
-		description: 'Push notifications through ntfy.sh or your own ntfy server.',
+	slack: {
+		label: 'Slack',
+		description: 'A Slack incoming webhook (api.slack.com/apps → Incoming Webhooks). Mattermost, Rocket.Chat and other Slack-compatible services work with the classic format.',
 		fields: [
-			{ key: 'server', label: 'Server URL', placeholder: 'https://ntfy.sh', required: true },
-			{ key: 'topic', label: 'Topic', placeholder: 'homelab-databases', required: true },
-			{ key: 'token', label: 'Access token', placeholder: 'tk_… (optional)', secret: true }
+			{ key: 'url', label: 'Webhook URL', placeholder: 'https://hooks.slack.com/services/…', secret: true, required: true, type: 'url' },
+			{
+				key: 'format',
+				label: 'Message format',
+				type: 'select',
+				default: 'blocks',
+				options: [
+					{ value: 'blocks', label: 'Block Kit (Slack)' },
+					{ value: 'attachments', label: 'Classic attachment (Mattermost, Rocket.Chat…)' }
+				]
+			}
+		]
+	},
+	discord: {
+		label: 'Discord',
+		description: 'A Discord channel webhook (Server settings → Integrations → Webhooks).',
+		fields: [{ key: 'url', label: 'Webhook URL', placeholder: 'https://discord.com/api/webhooks/…', secret: true, required: true, type: 'url' }]
+	},
+	telegram: {
+		label: 'Telegram',
+		description: 'Messages from a Telegram bot (create one with @BotFather) to a chat, group or channel the bot is in.',
+		fields: [
+			{ key: 'botToken', label: 'Bot token', placeholder: '123456:ABC-DEF…', secret: true, required: true },
+			{ key: 'chatId', label: 'Chat ID', placeholder: '-1001234567890 or @channelname', required: true },
+			{ key: 'apiUrl', label: 'Bot API server', placeholder: 'https://api.telegram.org', type: 'url', help: 'Only for a self-hosted Bot API server.' }
+		]
+	},
+	pushover: {
+		label: 'Pushover',
+		description: 'Push notifications through Pushover. Critical alerts are sent with high priority.',
+		fields: [
+			{ key: 'userKey', label: 'User or group key', secret: true, required: true },
+			{ key: 'appToken', label: 'Application API token', secret: true, required: true },
+			{ key: 'device', label: 'Device', placeholder: 'all devices' },
+			{ key: 'sound', label: 'Sound', placeholder: 'default' }
 		]
 	},
 	gotify: {
 		label: 'Gotify',
 		description: 'Messages to a Gotify application.',
 		fields: [
-			{ key: 'url', label: 'Server URL', placeholder: 'https://gotify.example.com', required: true },
+			{ key: 'url', label: 'Server URL', placeholder: 'https://gotify.example.com', required: true, type: 'url' },
 			{ key: 'token', label: 'Application token', secret: true, required: true }
 		]
 	},
-	discord: {
-		label: 'Discord',
-		description: 'A Discord channel webhook (Server settings → Integrations → Webhooks).',
-		fields: [{ key: 'url', label: 'Webhook URL', placeholder: 'https://discord.com/api/webhooks/…', secret: true, required: true }]
+	ntfy: {
+		label: 'ntfy',
+		description: 'Push notifications through ntfy.sh or your own ntfy server.',
+		fields: [
+			{ key: 'server', label: 'Server URL', placeholder: 'https://ntfy.sh', required: true, type: 'url', default: 'https://ntfy.sh' },
+			{ key: 'topic', label: 'Topic', placeholder: 'homelab-databases', required: true },
+			{ key: 'token', label: 'Access token', placeholder: 'tk_… (optional)', secret: true }
+		]
 	},
-	slack: {
-		label: 'Slack-compatible',
-		description: 'Incoming webhooks for Slack, Mattermost, Rocket.Chat and others that accept Slack’s format.',
-		fields: [{ key: 'url', label: 'Webhook URL', placeholder: 'https://hooks.slack.com/services/…', secret: true, required: true }]
+	matrix: {
+		label: 'Matrix',
+		description: 'Messages to a Matrix room as a (bot) user. Invite the user to the room first.',
+		fields: [
+			{ key: 'homeserver', label: 'Homeserver URL', placeholder: 'https://matrix.example.org', required: true, type: 'url' },
+			{ key: 'room', label: 'Room ID or alias', placeholder: '!abcdef:example.org or #alerts:example.org', required: true },
+			{ key: 'token', label: 'Access token', secret: true, required: true }
+		]
+	},
+	email: {
+		label: 'Email (SMTP)',
+		description: 'Email through any SMTP server. Use implicit TLS on port 465 or STARTTLS on 587.',
+		fields: [
+			{ key: 'host', label: 'SMTP host', placeholder: 'smtp.example.com', required: true },
+			{ key: 'port', label: 'Port', placeholder: '587', type: 'number', default: '587' },
+			{
+				key: 'security',
+				label: 'Encryption',
+				type: 'select',
+				default: 'starttls',
+				options: [
+					{ value: 'starttls', label: 'STARTTLS (usually 587)' },
+					{ value: 'tls', label: 'TLS (usually 465)' },
+					{ value: 'none', label: 'None (trusted network only)' }
+				]
+			},
+			{ key: 'username', label: 'Username', placeholder: 'optional' },
+			{ key: 'password', label: 'Password', secret: true },
+			{ key: 'from', label: 'From', placeholder: 'pg·modern <alerts@example.com>', required: true },
+			{ key: 'to', label: 'To', placeholder: 'you@example.com, ops@example.com', required: true, type: 'emails' },
+			{
+				key: 'verifyCert',
+				label: 'Server certificate',
+				type: 'select',
+				default: 'verify',
+				options: [
+					{ value: 'verify', label: 'Verify' },
+					{ value: 'skip', label: 'Accept self-signed' }
+				]
+			}
+		]
+	},
+	homeassistant: {
+		label: 'Home Assistant',
+		description: 'A Home Assistant automation webhook, or a notify service (e.g. the companion app) called with a long-lived access token.',
+		fields: [
+			{ key: 'url', label: 'Home Assistant URL', placeholder: 'http://homeassistant.local:8123', required: true, type: 'url' },
+			{
+				key: 'mode',
+				label: 'Send with',
+				type: 'select',
+				default: 'webhook',
+				options: [
+					{ value: 'webhook', label: 'Automation webhook' },
+					{ value: 'service', label: 'Notify service' }
+				]
+			},
+			{ key: 'webhookId', label: 'Webhook ID', secret: true, required: true, showIf: { key: 'mode', values: ['webhook'] } },
+			{ key: 'service', label: 'Notify service', placeholder: 'mobile_app_pixel_8', required: true, showIf: { key: 'mode', values: ['service'] }, help: 'The part after notify., e.g. mobile_app_pixel_8.' },
+			{ key: 'token', label: 'Long-lived access token', secret: true, required: true, showIf: { key: 'mode', values: ['service'] } }
+		]
 	},
 	webhook: {
 		label: 'Webhook (JSON)',
-		description: 'POSTs a JSON document to any URL (n8n, Home Assistant, Node-RED, your own service).',
+		description: 'POSTs a JSON document to any URL (n8n, Node-RED, your own service).',
 		fields: [
-			{ key: 'url', label: 'URL', placeholder: 'https://example.com/hooks/pg-modern', secret: true, required: true },
+			{ key: 'url', label: 'URL', placeholder: 'https://example.com/hooks/pg-modern', secret: true, required: true, type: 'url' },
 			{ key: 'authorization', label: 'Authorization header', placeholder: 'Bearer … (optional)', secret: true }
 		]
 	},
@@ -157,7 +268,7 @@ export const CHANNELS: Record<ChannelKind, { label: string; description: string;
 		label: 'Apprise API',
 		description: 'An Apprise API notify endpoint, which fans out to anything Apprise supports.',
 		fields: [
-			{ key: 'url', label: 'Notify URL', placeholder: 'http://apprise:8000/notify/pg-modern', secret: true, required: true },
+			{ key: 'url', label: 'Notify URL', placeholder: 'http://apprise:8000/notify/pg-modern', secret: true, required: true, type: 'url' },
 			{ key: 'tag', label: 'Tag', placeholder: 'optional' }
 		]
 	}
@@ -167,6 +278,55 @@ export function isChannelKind(v: unknown): v is ChannelKind {
 	return typeof v === 'string' && (CHANNEL_KINDS as string[]).includes(v);
 }
 
+/** Whether a field applies given the channel's other settings (see `showIf`). */
+export function fieldVisible(f: ChannelField, config: Record<string, string | undefined>, kind?: ChannelKind): boolean {
+	if (!f.showIf) return true;
+	const dep = kind ? CHANNELS[kind].fields.find((x) => x.key === f.showIf!.key) : undefined;
+	const v = config[f.showIf.key] || dep?.default || '';
+	return f.showIf.values.includes(v);
+}
+
+/** Which alerts reach a channel, and when. Not secret: shown and edited in the browser. */
+export interface ChannelOptions {
+	/** Only alerts at least this severe. */
+	minSeverity: Severity;
+	/** Rule kinds that reach this channel; empty: all. */
+	ruleKinds: AlertRuleKind[];
+	/** Connection ids that reach this channel; empty: all. */
+	connectionIds: string[];
+	/** Also send "resolved" notifications (the rule's own setting still applies). */
+	sendResolved: boolean;
+	/** Also send "still firing" reminders. */
+	sendRenotify: boolean;
+	quietHours: QuietHours;
+	/** At most this many notifications an hour; 0 = no limit. */
+	maxPerHour: number;
+	/** Drop a repeat of the same alert event within this many minutes; 0 = off. */
+	dedupeMinutes: number;
+}
+
+export interface QuietHours {
+	enabled: boolean;
+	/** "HH:MM", local to `timezone`. */
+	start: string;
+	end: string;
+	/** IANA zone; '' means the server's. */
+	timezone: string;
+	/** Critical alerts (and their recovery) are still sent during quiet hours. */
+	allowCritical: boolean;
+}
+
+export const DEFAULT_CHANNEL_OPTIONS: ChannelOptions = {
+	minSeverity: 'warning',
+	ruleKinds: [],
+	connectionIds: [],
+	sendResolved: true,
+	sendRenotify: true,
+	quietHours: { enabled: false, start: '22:00', end: '07:00', timezone: '', allowCritical: true },
+	maxPerHour: 30,
+	dedupeMinutes: 5
+};
+
 /** A channel as the browser sees it: secrets only as "set" plus a harmless hint. */
 export interface AlertChannel {
 	id: string;
@@ -174,11 +334,32 @@ export interface AlertChannel {
 	kind: ChannelKind;
 	enabled: boolean;
 	config: Record<string, string>;
+	options: ChannelOptions;
 	/** Secret field → a redacted hint (e.g. `discord.com/…`); absent when not set. */
 	secrets: Record<string, string>;
 	lastSentAt: string | null;
 	lastError: string | null;
 	createdAt: string;
+}
+
+export type DeliveryStatus = 'sending' | 'sent' | 'failed' | 'suppressed';
+
+/** One attempt (or deliberate skip) to notify one channel. */
+export interface AlertDelivery {
+	id: number;
+	at: string;
+	channelId: string | null;
+	channelName: string;
+	channelKind: ChannelKind;
+	eventId: number | null;
+	event: AlertTransition | 'test';
+	severity: Severity;
+	title: string;
+	connectionName: string | null;
+	status: DeliveryStatus;
+	/** Why it was suppressed, or the service's error. */
+	detail: string | null;
+	durationMs: number | null;
 }
 
 export type AlertTransition = 'fired' | 'resolved' | 'renotified';

@@ -31,6 +31,7 @@
 		"@sveltejs/vite-plugin-svelte": "^7.2.0",
 		"@tailwindcss/vite": "^4.3.3",
 		"@types/node": "^26.6.4",
+		"@types/nodemailer": "^8.0.2",
 		"@types/pg": "^8.23.1",
 		"@types/pg-cursor": "^2.7.2",
 		"@types/ssh2-sftp-client": "^9.0.6",
@@ -49,6 +50,7 @@
 	"dependencies": {
 		"aws4fetch": "^1.0.20",
 		"mysql2": "^3.24.5",
+		"nodemailer": "^10.1.0",
 		"openid-client": "^6.8.8",
 		"pg": "^8.23.1",
 		"pg-cursor": "^2.22.1",

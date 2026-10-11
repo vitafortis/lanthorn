@@ -1,11 +1,12 @@
 /**
- * Alert channels, rules, per-(rule, connection) state and the event history, in the
- * SQLite store (tables created by store.ts `migrateAlerts`).
+ * Alert channels, rules, per-(rule, connection) state, the event history and the
+ * per-channel delivery log, in the SQLite store (tables created by store.ts `migrateAlerts`).
  */
 import { randomUUID } from 'node:crypto';
 import { getKv, setKv, sqlite } from '../store.ts';
 import { decrypt, encrypt } from '../crypto.ts';
 import { secretHint } from './notify.ts';
+import { normalizeOptions, type RecentDeliveries } from './policy.ts';
 import type { RuleState, Status } from './state.ts';
 import {
 	CHANNELS,
@@ -13,8 +14,13 @@ import {
 	RULE_KINDS,
 	RULES,
 	defaultParams,
+	fieldVisible,
+	isChannelKind,
 	type ActiveAlert,
 	type AlertChannel,
+	type AlertDelivery,
+	type ChannelOptions,
+	type DeliveryStatus,
 	type AlertEvent,
 	type AlertRule,
 	type AlertRuleKind,
@@ -62,6 +68,7 @@ function toChannel(r: Row): AlertChannel {
 		kind: r.kind as ChannelKind,
 		enabled: r.enabled === 1,
 		config: parseJson(r.config, {}),
+		options: normalizeOptions(parseJson(r.options, {})),
 		secrets: Object.fromEntries(Object.entries(secrets).filter(([, v]) => v).map(([k, v]) => [k, secretHint(v)])),
 		lastSentAt: (r.last_sent_at as string) ?? null,
 		lastError: (r.last_error as string) ?? null,
@@ -69,17 +76,49 @@ function toChannel(r: Row): AlertChannel {
 	};
 }
 
+let migrated = false;
+
+/**
+ * One-time upgrade of channels stored by earlier versions: "Slack-compatible" channels
+ * keep the classic attachment format unless they point at Slack itself (which gets
+ * Block Kit), and every channel gets explicit routing/limit options.
+ */
+export function migrateChannels() {
+	if (migrated) return;
+	migrated = true;
+	if (getKv('migration:alert-channels-v2', false)) return;
+	const h = sqlite();
+	for (const r of h.prepare('SELECT * FROM alert_channels').all() as Row[]) {
+		const config = parseJson<Record<string, string>>(r.config, {});
+		if (r.kind === 'slack' && !config.format) {
+			let host = '';
+			try {
+				host = new URL(secretsOf(r).url ?? '').hostname;
+			} catch {
+				// unreadable or no URL: classic is the safe choice
+			}
+			config.format = host === 'hooks.slack.com' ? 'blocks' : 'attachments';
+		}
+		const options = normalizeOptions(parseJson(r.options, {}));
+		h.prepare('UPDATE alert_channels SET config = ?, options = ? WHERE id = ?').run(JSON.stringify(config), JSON.stringify(options), r.id as string);
+	}
+	setKv('migration:alert-channels-v2', true);
+}
+
 export function listChannels(): AlertChannel[] {
+	migrateChannels();
 	return (sqlite().prepare('SELECT * FROM alert_channels ORDER BY name COLLATE NOCASE').all() as Row[]).map(toChannel);
 }
 
 export function getChannel(id: string): AlertChannel | undefined {
+	migrateChannels();
 	const r = sqlite().prepare('SELECT * FROM alert_channels WHERE id = ?').get(id) as Row | undefined;
 	return r && toChannel(r);
 }
 
 /** A channel with its decrypted secrets, for sending. Server-side only. */
 export function channelWithSecrets(id: string): { channel: AlertChannel; secrets: Record<string, string> } | undefined {
+	migrateChannels();
 	const r = sqlite().prepare('SELECT * FROM alert_channels WHERE id = ?').get(id) as Row | undefined;
 	return r && { channel: toChannel(r), secrets: secretsOf(r) };
 }
@@ -89,14 +128,15 @@ export interface ChannelInput {
 	kind: ChannelKind;
 	enabled: boolean;
 	config: Record<string, string>;
+	options: ChannelOptions;
 	/** Secret fields; a missing or undefined key keeps the stored value, '' clears it. */
 	secrets: Record<string, string | undefined>;
 }
 
-/** Splits the kind's fields into config and secrets and keeps unchanged secrets. */
-function mergeSecrets(kind: ChannelKind, existing: Record<string, string>, incoming: Record<string, string | undefined>) {
+/** Keeps unchanged secrets of the fields that apply; drops the rest. */
+function mergeSecrets(kind: ChannelKind, config: Record<string, string>, existing: Record<string, string>, incoming: Record<string, string | undefined>) {
 	const out: Record<string, string> = {};
-	for (const f of CHANNELS[kind].fields.filter((f) => f.secret)) {
+	for (const f of CHANNELS[kind].fields.filter((f) => f.secret && fieldVisible(f, config, kind))) {
 		const v = incoming[f.key];
 		if (v === undefined) {
 			if (existing[f.key]) out[f.key] = existing[f.key];
@@ -107,7 +147,7 @@ function mergeSecrets(kind: ChannelKind, existing: Record<string, string>, incom
 
 /** Fields the kind requires that are missing after merging; empty when complete. */
 export function missingFields(kind: ChannelKind, config: Record<string, string>, secrets: Record<string, string>): string[] {
-	return CHANNELS[kind].fields.filter((f) => f.required && !(f.secret ? secrets[f.key] : config[f.key])).map((f) => f.label);
+	return CHANNELS[kind].fields.filter((f) => f.required && fieldVisible(f, config, kind) && !(f.secret ? secrets[f.key] : config[f.key])).map((f) => f.label);
 }
 
 /** Resolves an input against the stored channel (for tests of unsaved edits, too). */
@@ -117,8 +157,10 @@ export function resolveChannelInput(input: ChannelInput, id?: string): { config:
 	for (const f of CHANNELS[input.kind].fields.filter((f) => !f.secret)) {
 		const v = input.config[f.key];
 		if (typeof v === 'string' && v.trim()) config[f.key] = v.trim();
+		else if (f.type === 'select' && f.default) config[f.key] = f.default;
 	}
-	return { config, secrets: mergeSecrets(input.kind, existing, input.secrets) };
+	for (const f of CHANNELS[input.kind].fields) if (!f.secret && !fieldVisible(f, config, input.kind)) delete config[f.key];
+	return { config, secrets: mergeSecrets(input.kind, config, existing, input.secrets) };
 }
 
 export function createChannel(input: ChannelInput): AlertChannel {
@@ -126,8 +168,8 @@ export function createChannel(input: ChannelInput): AlertChannel {
 	const { config, secrets } = resolveChannelInput(input);
 	const t = now();
 	sqlite()
-		.prepare('INSERT INTO alert_channels (id, name, kind, config, secret, enabled, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)')
-		.run(id, input.name, input.kind, JSON.stringify(config), encrypt(JSON.stringify(secrets), channelContext(id)), input.enabled ? 1 : 0, t, t);
+		.prepare('INSERT INTO alert_channels (id, name, kind, config, options, secret, enabled, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)')
+		.run(id, input.name, input.kind, JSON.stringify(config), JSON.stringify(input.options), encrypt(JSON.stringify(secrets), channelContext(id)), input.enabled ? 1 : 0, t, t);
 	return getChannel(id)!;
 }
 
@@ -135,8 +177,8 @@ export function updateChannel(id: string, input: ChannelInput): AlertChannel | u
 	if (!getChannel(id)) return undefined;
 	const { config, secrets } = resolveChannelInput(input, id);
 	sqlite()
-		.prepare('UPDATE alert_channels SET name = ?, kind = ?, config = ?, secret = ?, enabled = ?, updated_at = ? WHERE id = ?')
-		.run(input.name, input.kind, JSON.stringify(config), encrypt(JSON.stringify(secrets), channelContext(id)), input.enabled ? 1 : 0, now(), id);
+		.prepare('UPDATE alert_channels SET name = ?, kind = ?, config = ?, options = ?, secret = ?, enabled = ?, updated_at = ? WHERE id = ?')
+		.run(input.name, input.kind, JSON.stringify(config), JSON.stringify(input.options), encrypt(JSON.stringify(secrets), channelContext(id)), input.enabled ? 1 : 0, now(), id);
 	return getChannel(id);
 }
 
@@ -362,4 +404,165 @@ export function listEvents(opts: { before?: number; limit?: number; connectionId
 		delivered: r.delivered as number,
 		error: (r.error as string) ?? null
 	}));
+}
+
+// --- delivery log ----------------------------------------------------------------------
+
+const KEEP_DELIVERIES = 5000;
+
+/** Starts a log entry: 'sending' (counts towards limits right away) or 'suppressed'. */
+export function addDelivery(d: {
+	channel: Pick<AlertChannel, 'name' | 'kind'> & { id: string | null };
+	eventId: number | null;
+	event: AlertTransition | 'test';
+	severity: Severity;
+	title: string;
+	connectionName: string | null;
+	dedupeKey: string | null;
+	status: DeliveryStatus;
+	detail?: string | null;
+	at?: number;
+}): number {
+	const h = sqlite();
+	const r = h
+		.prepare(
+			`INSERT INTO alert_deliveries (at, channel_id, channel_name, channel_kind, event_id, event, severity, title, connection_name, dedupe_key, status, detail)
+			 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+		)
+		.run(d.at ?? Date.now(), d.channel.id, d.channel.name, d.channel.kind, d.eventId, d.event, d.severity, d.title, d.connectionName, d.dedupeKey, d.status, d.detail ?? null);
+	h.prepare('DELETE FROM alert_deliveries WHERE id <= (SELECT max(id) - ? FROM alert_deliveries)').run(KEEP_DELIVERIES);
+	return Number(r.lastInsertRowid);
+}
+
+export function finishDelivery(id: number, status: 'sent' | 'failed', detail: string | null, durationMs: number) {
+	sqlite().prepare('UPDATE alert_deliveries SET status = ?, detail = ?, duration_ms = ? WHERE id = ?').run(status, detail?.slice(0, 1000) ?? null, Math.round(durationMs), id);
+}
+
+/** What the policy needs to know about a channel's recent sends. */
+export function recentDeliveries(channelId: string, dedupeKey: string | null, at = Date.now()): RecentDeliveries {
+	const h = sqlite();
+	const lastHour = (
+		h
+			.prepare(`SELECT count(*) AS n FROM alert_deliveries WHERE channel_id = ? AND at > ? AND status IN ('sending', 'sent') AND event != 'test'`)
+			.get(channelId, at - 3_600_000) as { n: number }
+	).n;
+	const same = dedupeKey
+		? (h.prepare(`SELECT max(at) AS at FROM alert_deliveries WHERE channel_id = ? AND dedupe_key = ? AND status IN ('sending', 'sent')`).get(channelId, dedupeKey) as {
+				at: number | null;
+			})
+		: null;
+	return { lastHour, lastSameAt: same?.at ?? null };
+}
+
+export function listDeliveries(opts: { before?: number; limit?: number; channelId?: string } = {}): AlertDelivery[] {
+	const where: string[] = [];
+	const values: (string | number)[] = [];
+	if (opts.before) where.push('id < ?'), values.push(opts.before);
+	if (opts.channelId) where.push('channel_id = ?'), values.push(opts.channelId);
+	const rows = sqlite()
+		.prepare(`SELECT * FROM alert_deliveries ${where.length ? `WHERE ${where.join(' AND ')}` : ''} ORDER BY id DESC LIMIT ?`)
+		.all(...values, Math.min(Math.max(1, opts.limit ?? 50), 500)) as Row[];
+	return rows.map((r) => ({
+		id: r.id as number,
+		at: new Date(r.at as number).toISOString(),
+		channelId: (r.channel_id as string) ?? null,
+		channelName: r.channel_name as string,
+		channelKind: r.channel_kind as ChannelKind,
+		eventId: (r.event_id as number) ?? null,
+		event: r.event as AlertDelivery['event'],
+		severity: r.severity as Severity,
+		title: r.title as string,
+		connectionName: (r.connection_name as string) ?? null,
+		status: r.status as DeliveryStatus,
+		detail: (r.detail as string) ?? null,
+		durationMs: (r.duration_ms as number) ?? null
+	}));
+}
+
+// --- backup ----------------------------------------------------------------------------
+
+/** Alert configuration as it travels in an encrypted config backup (secrets in the clear). */
+export interface AlertBackup {
+	settings: AlertSettings;
+	channels: {
+		id: string;
+		name: string;
+		kind: ChannelKind;
+		enabled: boolean;
+		config: Record<string, string>;
+		options: ChannelOptions;
+		secrets: Record<string, string>;
+		createdAt: string;
+	}[];
+	rules: Omit<AlertRule, 'updatedAt'>[];
+}
+
+export function exportAlertConfig(): AlertBackup {
+	migrateChannels();
+	const rows = sqlite().prepare('SELECT * FROM alert_channels ORDER BY name COLLATE NOCASE').all() as Row[];
+	return {
+		settings: alertSettings(),
+		channels: rows.map((r) => {
+			const c = toChannel(r);
+			return { id: c.id, name: c.name, kind: c.kind, enabled: c.enabled, config: c.config, options: c.options, secrets: secretsOf(r), createdAt: c.createdAt };
+		}),
+		rules: listRules().map(({ updatedAt: _, ...r }) => r)
+	};
+}
+
+/**
+ * Replaces the alert configuration with a backed-up one (inside the caller's
+ * transaction), like the other settings: channels and rules not in the backup are
+ * removed, the rest written by id with secrets re-sealed under this install's key.
+ * Rules for connections that don't exist here are skipped. The history and delivery
+ * log are kept.
+ */
+export function importAlertConfig(b: AlertBackup): { channels: number; rules: number; skippedRules: number } {
+	const h = sqlite();
+	const t = now();
+	const out = { channels: 0, rules: 0, skippedRules: 0 };
+	if (b.settings && typeof b.settings === 'object') setKv('alerts:settings', { ...DEFAULT_ALERT_SETTINGS, ...b.settings });
+	const keepChannels = (Array.isArray(b.channels) ? b.channels : []).map((c) => c?.id).filter((id): id is string => typeof id === 'string');
+	const keepRules = (Array.isArray(b.rules) ? b.rules : []).map((r) => r?.id).filter((id): id is string => typeof id === 'string');
+	h.prepare(`DELETE FROM alert_channels WHERE id NOT IN (SELECT value FROM json_each(?))`).run(JSON.stringify(keepChannels));
+	h.prepare(`DELETE FROM alert_rules WHERE id NOT IN (SELECT value FROM json_each(?))`).run(JSON.stringify(keepRules));
+	const upsertChannel = h.prepare(
+		`INSERT INTO alert_channels (id, name, kind, config, options, secret, enabled, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+		 ON CONFLICT(id) DO UPDATE SET name = excluded.name, kind = excluded.kind, config = excluded.config, options = excluded.options,
+			secret = excluded.secret, enabled = excluded.enabled, updated_at = excluded.updated_at`
+	);
+	for (const c of Array.isArray(b.channels) ? b.channels : []) {
+		if (typeof c?.id !== 'string' || !c.id || !isChannelKind(c.kind)) continue;
+		const strings = (v: unknown) =>
+			Object.fromEntries(Object.entries(v && typeof v === 'object' ? (v as Record<string, unknown>) : {}).filter((e): e is [string, string] => typeof e[1] === 'string'));
+		upsertChannel.run(
+			c.id,
+			String(c.name || CHANNELS[c.kind].label).slice(0, 80),
+			c.kind,
+			JSON.stringify(strings(c.config)),
+			JSON.stringify(normalizeOptions(c.options)),
+			encrypt(JSON.stringify(strings(c.secrets)), channelContext(c.id)),
+			c.enabled === false ? 0 : 1,
+			c.createdAt || t,
+			t
+		);
+		out.channels++;
+	}
+	const connExists = h.prepare('SELECT 1 FROM connections WHERE id = ?');
+	const upsertRule = h.prepare(
+		`INSERT INTO alert_rules (id, kind, connection_id, enabled, params, notify_resolved, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+		 ON CONFLICT(id) DO UPDATE SET kind = excluded.kind, connection_id = excluded.connection_id, enabled = excluded.enabled,
+			params = excluded.params, notify_resolved = excluded.notify_resolved, updated_at = excluded.updated_at`
+	);
+	for (const r of Array.isArray(b.rules) ? b.rules : []) {
+		if (typeof r?.id !== 'string' || !(RULE_KINDS as string[]).includes(r.kind)) continue;
+		if (r.connectionId && !connExists.get(r.connectionId)) {
+			out.skippedRules++;
+			continue;
+		}
+		upsertRule.run(r.id, r.kind, r.connectionId ?? null, r.enabled === false ? 0 : 1, JSON.stringify(cleanParams(r.kind, r.params ?? {})), r.notifyResolved === false ? 0 : 1, r.createdAt || t, t);
+		out.rules++;
+	}
+	if (out.rules) setKv('alerts:defaults-added', true);
+	return out;
 }

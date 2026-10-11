@@ -28,7 +28,7 @@
 	const CATEGORIES: { key: Category; label: string; hint: string }[] = [
 		{ key: 'connections', label: 'Connections', hint: 'with their passwords, and saved queries' },
 		{ key: 'users', label: 'Users', hint: 'password hashes, SSO links, connection access' },
-		{ key: 'settings', label: 'Settings', hint: 'discovery, Arcane keys, single sign-on' }
+		{ key: 'settings', label: 'Settings', hint: 'discovery, Arcane keys, single sign-on, alert channels and rules' }
 	];
 
 	let exp = $state({ passphrase: '', confirm: '', include: { connections: true, users: true, settings: true } as Record<Category, boolean> });
@@ -85,6 +85,7 @@
 		grants: number;
 		savedQueries: { restored: number; skipped: number };
 		settings: boolean;
+		alerts: { channels: number; rules: number; skippedRules: number } | null;
 	};
 
 	let restoreFile = $state<File | null>(null);
@@ -135,7 +136,8 @@
 			const parts = [
 				choose.connections && `${r.connections.added} connections added, ${r.connections.updated} updated`,
 				choose.users && `${r.users.added} users added, ${r.users.updated} updated`,
-				choose.settings && 'settings replaced'
+				choose.settings && 'settings replaced',
+				r.alerts && `${r.alerts.channels} alert channels, ${r.alerts.rules} alert rules`
 			].filter(Boolean);
 			toast('success', 'Backup restored', parts.join(' · '));
 			preview = null;

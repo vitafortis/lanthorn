@@ -1,6 +1,7 @@
 /**
  * The alert job: checks every connection that has rules, advances each (rule,
- * connection) state machine and notifies every enabled channel on transitions.
+ * connection) state machine and, on transitions, notifies every enabled channel that
+ * the channel's routing, quiet hours and limits allow.
  */
 import { defineJob } from '../jobs.ts';
 import { getConnection, listConnections } from '../store.ts';
@@ -8,68 +9,14 @@ import { toQueryError } from '../engine.ts';
 import { monitorable, snapshot, type Snapshot } from '../monitor.ts';
 import { DAY, sizeNear } from '../size-history.ts';
 import { consecutiveFor, effectiveRules, evaluate, step, type EvalContext } from './state.ts';
-import { deliver, type Notification } from './notify.ts';
-import {
-	addEvent,
-	alertSettings,
-	channelWithSecrets,
-	deleteState,
-	listChannels,
-	listRules,
-	listStates,
-	recordDelivery,
-	recordEventDelivery,
-	saveState
-} from './store.ts';
+import { broadcast, notificationFor } from './dispatch.ts';
+import { addEvent, alertSettings, deleteState, listRules, listStates, recordEventDelivery, saveState } from './store.ts';
 import { RULES, type AlertRule, type AlertRuleKind, type AlertTransition } from '#lib/alerts.ts';
 import type { Connection } from '#lib/types.ts';
 
 export const ALERT_JOB = 'alerts';
 const CONCURRENCY = 4;
 let lastRunAt = 0;
-
-export function notificationFor(
-	rule: { id: string; kind: AlertRuleKind } | null,
-	conn: Pick<Connection, 'id' | 'name' | 'engine'> | null,
-	event: Notification['event'],
-	message: string,
-	extra: { value?: number | null; since?: number | null } = {}
-): Notification {
-	const { publicUrl } = alertSettings();
-	const kind = rule?.kind;
-	return {
-		event,
-		severity: kind ? RULES[kind].severity : 'warning',
-		title: kind ? RULES[kind].label : 'Test notification',
-		message,
-		connection: conn ? { id: conn.id, name: conn.name, engine: conn.engine } : null,
-		rule: rule ? { id: rule.id, kind: rule.kind } : null,
-		value: extra.value ?? null,
-		since: extra.since ? new Date(extra.since).toISOString() : null,
-		at: new Date().toISOString(),
-		url: publicUrl ? `${publicUrl.replace(/\/+$/, '')}${conn ? `/c/${encodeURIComponent(conn.id)}` : '/alerts'}` : null
-	};
-}
-
-/** Sends to every enabled channel; returns how many succeeded and the errors. */
-export async function broadcast(n: Notification): Promise<{ delivered: number; errors: string[] }> {
-	const channels = listChannels().filter((c) => c.enabled);
-	const results = await Promise.allSettled(
-		channels.map(async (c) => {
-			const full = channelWithSecrets(c.id);
-			if (!full) return;
-			try {
-				await deliver(c.kind, full.channel.config, full.secrets, n);
-				recordDelivery(c.id, null);
-			} catch (err) {
-				recordDelivery(c.id, (err as Error).message);
-				throw new Error(`${c.name}: ${(err as Error).message}`);
-			}
-		})
-	);
-	const errors = results.filter((r): r is PromiseRejectedResult => r.status === 'rejected').map((r) => (r.reason as Error).message);
-	return { delivered: results.length - errors.length, errors };
-}
 
 async function emit(rule: AlertRule, conn: Connection, transition: AlertTransition, message: string, value: number | null, since: number | null) {
 	const id = addEvent({
@@ -82,7 +29,7 @@ async function emit(rule: AlertRule, conn: Connection, transition: AlertTransiti
 		message
 	});
 	if (transition === 'resolved' && !rule.notifyResolved) return;
-	const { delivered, errors } = await broadcast(notificationFor(rule, conn, transition, message, { value, since }));
+	const { delivered, errors } = await broadcast(notificationFor(rule, conn, transition, message, { value, since }), id);
 	recordEventDelivery(id, delivered, errors);
 }
 

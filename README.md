@@ -28,7 +28,7 @@
 - **Saved queries**: name, describe and share queries per connection or for every connection; open them from the workspace header.
 - **EXPLAIN**: on Postgres, a visual plan tree with self time, misestimated row counts, buffers and the slowest node highlighted; `EXPLAIN ANALYZE` of a write runs inside a transaction that's rolled back. On MySQL the tree plan (`EXPLAIN ANALYZE` for reads on 8.0.18+), on MariaDB the JSON plan (`ANALYZE FORMAT=JSON` for reads).
 - **Server overview and activity**: version, size, cache hit ratio, extensions (storage engines and grants on MySQL); live sessions with lock chains, waiting and idle-in-transaction sessions, database and table sizes, dead tuples and unused indexes (Postgres) or the process list, InnoDB lock waits and index sizes (MySQL/MariaDB). Cancel or terminate a session (`KILL QUERY` / `KILL` on MySQL) once writes are unlocked.
-- **Alerts**: background checks for unreachable databases, connections near `max_connections`, long-running queries, database size and growth, transaction ID wraparound and replication lag, sent to ntfy, Gotify, Discord, Slack-compatible webhooks, a generic JSON webhook or Apprise.
+- **Alerts**: background checks for unreachable databases, connections near `max_connections`, long-running queries, database size and growth, transaction ID wraparound and replication lag, sent to Slack, Discord, Telegram, Pushover, Gotify, ntfy, Matrix, email (SMTP), Home Assistant, a generic JSON webhook or Apprise, with per-channel routing, quiet hours, rate limiting and a delivery log.
 - **Size history**: hourly database and table sizes, kept for a year, with a growth chart and the fastest-growing tables in each connection's overview.
 - **Health checks**: a Health tab with unused, duplicate and invalid indexes, missing foreign key indexes, bloat, vacuum, wraparound, sequences, long transactions, cache and connection usage, each with a plain-language explanation and a suggested fix to open in the editor (never run for you). See [Health checks](#health-checks).
 - **Read-only user helper**: generates the SQL for a dedicated least-privilege login, applies it if you choose, and switches the connection to it. See [A read-only user for pg·modern](#a-read-only-user-for-pgmodern).
@@ -372,20 +372,37 @@ Scan results stay on the server, and an import refers to them by key, so a disco
 
 **Alerts** (admins only) checks every connection in the background, once a minute by default, and notifies you when something needs attention.
 
-**Channels.** Add one or more under **Alerts → Channels**, and use **Send test** to check it works. Every enabled channel gets every notification.
+**Channels.** Add one or more under **Alerts → Channels**, and use **Send test** to check it works: the result, including the service's exact error (`HTTP 403: Forbidden: bot was blocked by the user`, `535 5.7.8 Authentication credentials invalid`, `ECONNREFUSED`, …), shows on the card and in the dialog.
 
 | Channel | What you enter |
 | --- | --- |
-| ntfy | Server URL (`https://ntfy.sh` or your own), topic, optional access token |
-| Gotify | Server URL and an application token |
+| Slack | An incoming-webhook URL. Messages use Block Kit (coloured by state, with an *Open in pg·modern* button). Pick *Classic attachment* for Mattermost, Rocket.Chat and other Slack-compatible services |
 | Discord | A channel webhook URL |
-| Slack-compatible | An incoming-webhook URL (Slack, Mattermost, Rocket.Chat, …) |
+| Telegram | A bot token (from @BotFather) and the chat ID (`-100…` for groups and channels, or `@channelname`); optionally a self-hosted Bot API server |
+| Pushover | Your user (or group) key and an application token; optional device and sound. Critical alerts use high priority |
+| Gotify | Server URL and an application token |
+| ntfy | Server URL (`https://ntfy.sh` or your own), topic, optional access token |
+| Matrix | Homeserver URL, a room ID (`!…:server`) or alias (`#…:server`), and an access token of a user in that room |
+| Email (SMTP) | Host, port, encryption (STARTTLS, usually 587; TLS, usually 465; or none on a trusted network), optional username and password, From and one or more To addresses. *Accept self-signed* skips certificate verification |
+| Home Assistant | Your Home Assistant URL, then either an automation **webhook ID** (receives the JSON below; trigger an automation with it) or a **notify service** such as `mobile_app_pixel_8` plus a long-lived access token |
 | Webhook (JSON) | Any URL, plus an optional `Authorization` header |
 | Apprise API | A notify URL such as `http://apprise:8000/notify/<key>`, optional tag |
 
-Tokens, webhook URLs and the authorization header are encrypted like connection passwords and never sent back to the browser (the UI only shows the host). Leave a secret field blank when editing to keep it.
+Tokens, passwords, webhook URLs and IDs and the authorization header are encrypted like connection passwords and never sent back to the browser (the UI only shows a URL's host, or that a value is set). Leave a secret field blank when editing to keep it. Errors are scrubbed of secret values before they're stored or shown.
 
-The generic webhook receives a `POST` with `Content-Type: application/json`:
+**Routing, quiet hours and limits.** Each channel has a **Routing & limits** tab:
+
+- **Which alerts**: warnings and critical, or critical only; only some rule types; only some connections (none selected means all); and whether to send "resolved" and "still firing" reminders. So a Telegram chat can get only critical alerts for production databases while Slack gets everything.
+- **Quiet hours**: a daily window (e.g. 22:00–07:00, crossing midnight is fine) in a time zone of your choice, or the server's. Alerts in the window are held back, unless **Still send critical alerts** is on (the default), which lets critical alerts and their recovery through.
+- **Limits**: at most *N* notifications per hour (30 by default, 0 for no limit; a newly firing critical alert always goes through), and dropping a repeat of the same alert event on the same connection within *N* minutes (5 by default), which quiets flapping checks.
+
+Test notifications ignore routing, quiet hours and limits.
+
+**Delivery log.** **Alerts → Delivery log** lists every attempt to notify a channel, newest first: sent (with how long it took), failed (with the error) or held back (with the reason: not routed, quiet hours, duplicate, rate limit), including tests. Filter by channel, or use **Log** on a channel's card. The last 5,000 entries are kept. **Active & history** still records every alert transition and how many channels it reached.
+
+Channels from earlier versions keep working: "Slack-compatible" channels that point at `hooks.slack.com` switch to Block Kit, others keep the classic format, and every channel starts with the default routing (everything) and limits.
+
+The generic webhook (and a Home Assistant webhook) receives a `POST` with `Content-Type: application/json`:
 
 ```json
 {
@@ -487,9 +504,9 @@ The container runs as uid 1000, so the share must be writable by it (NFS: squash
 
 ## Backup & restore
 
-**Settings → Backup & restore** downloads a `.pgmbackup` file with pg·modern's own configuration: connections (with their passwords), saved queries, users (password hashes, SSO links, connection access and grants), and settings (discovery, Arcane managers and their API keys, single sign-on, the password sign-in toggle). Query history, the audit log, sessions and database backup destinations and schedules aren’t included.
+**Settings → Backup & restore** downloads a `.pgmbackup` file with pg·modern's own configuration: connections (with their passwords), saved queries, users (password hashes, SSO links, connection access and grants), and settings (discovery, Arcane managers and their API keys, single sign-on, the password sign-in toggle, and alerts: their settings, rules and notification channels with their secrets). Query history, the alert history and delivery log, the audit log, sessions and database backup destinations and schedules aren’t included.
 
-The file is encrypted with a passphrase you choose (12+ characters), not the master key, so it also restores on a fresh install with a different `secret.key` or `PGM_SECRET_KEY`. Restoring first shows a preview of what would be added or updated, then merges the categories you pick: connections by id, users by email. Nothing is deleted, your own account is never changed, and settings are replaced as a whole. The API is `POST /api/backup` and `POST /api/backup/restore` (admins only).
+The file is encrypted with a passphrase you choose (12+ characters), not the master key, so it also restores on a fresh install with a different `secret.key` or `PGM_SECRET_KEY`. Restoring first shows a preview of what would be added or updated, then merges the categories you pick: connections by id, users by email. Nothing is deleted, your own account is never changed, and settings, including the alert rules and channels, are replaced as a whole (alert rules for connections that are not on this install are skipped). The API is `POST /api/backup` and `POST /api/backup/restore` (admins only).
 
 ## Health checks
 
@@ -531,7 +548,7 @@ Nothing runs until you choose to. **Copy** the script to run it elsewhere, or **
 ## Security model
 
 - **Credentials** are sealed with AES-256-GCM, bound to their connection id. The SQLite file and key file are created with mode `0600`. Back up `secret.key`, or set `PGM_SECRET_KEY`. Without it, stored passwords can't be recovered.
-- **Backup files** hold decrypted connection passwords, API keys and the SSO client secret, re-encrypted with AES-256-GCM under a key derived from your passphrase (scrypt), not the master key. Treat the file and its passphrase like a password manager export. Only admins can export or restore, and both are recorded in the audit log.
+- **Backup files** hold decrypted connection passwords, API keys, alert channel secrets and the SSO client secret, re-encrypted with AES-256-GCM under a key derived from your passphrase (scrypt), not the master key. Treat the file and its passphrase like a password manager export. Only admins can export or restore, and both are recorded in the audit log.
 - **Read-only mode** on Postgres is enforced in four layers:
   1. The session sets `default_transaction_read_only=on`.
   2. Every request runs inside `BEGIN TRANSACTION READ ONLY … ROLLBACK`.

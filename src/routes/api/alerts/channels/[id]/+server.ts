@@ -7,8 +7,9 @@ import { parseChannelInput } from '#lib/server/alerts/input.ts';
 import type { RequestHandler } from './$types';
 
 export const PUT: RequestHandler = handler(async ({ params, request, locals }) => {
-	if (!getChannel(params.id)) throw new NotFound('Channel not found');
-	const input = parseChannelInput(await request.json().catch(() => null));
+	const existing = getChannel(params.id);
+	if (!existing) throw new NotFound('Channel not found');
+	const input = parseChannelInput(await request.json().catch(() => null), existing.options);
 	const { config, secrets } = resolveChannelInput(input, params.id);
 	const missing = missingFields(input.kind, config, secrets);
 	if (missing.length) throw new BadRequest(`Missing: ${missing.join(', ')}`);
