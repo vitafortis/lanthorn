@@ -6,6 +6,8 @@ import { BackupError } from './backup.ts';
 import { deleteKv, getKv, getManagerKey, getPassword, setKv, sqlite } from './store.ts';
 import type { Engine, Flavor, Role, Settings, SslMode } from '#lib/types.ts';
 import { isEngine } from '#lib/engine.ts';
+import { CHANNELS } from '#lib/alerts.ts';
+import { exportAlertConfig, importAlertConfig, listChannels, listRules, type AlertBackup } from './alerts/store.ts';
 
 /**
  * What goes into a backup and how it merges back in. history, audit, sessions and
@@ -67,6 +69,8 @@ export interface BackupPayload {
 	settings?: BackupSettings;
 	/** Rows of the saved_queries table, when this install has one (column names as stored). */
 	savedQueries?: Record<string, unknown>[];
+	/** Alert settings, channels (secrets decrypted) and rules; part of the settings category. Missing in backups before 0.6. */
+	alerts?: AlertBackup;
 }
 
 type Row = Record<string, unknown>;
@@ -152,6 +156,7 @@ export function snapshot(include: BackupInclude): BackupPayload {
 			localLoginDisabled: getKv<boolean | null>('local-login-disabled', null),
 			managerKeys
 		};
+		payload.alerts = exportAlertConfig();
 	}
 	return payload;
 }
@@ -168,6 +173,7 @@ export function summarizeInclude(p: BackupPayload): string {
 	if (p.savedQueries) parts.push(`${p.savedQueries.length} saved queries`);
 	if (p.users) parts.push(`${p.users.length} users`, `${p.grants?.length ?? 0} grants`);
 	if (p.settings) parts.push(`settings (${Object.keys(p.settings.managerKeys).length} manager keys${p.settings.sso ? ', SSO' : ''})`);
+	if (p.alerts) parts.push(`${p.alerts.channels.length} alert channels, ${p.alerts.rules.length} alert rules`);
 	return parts.join(', ') || 'nothing';
 }
 
@@ -211,6 +217,13 @@ export function validatePayload(raw: unknown): BackupPayload {
 	if (p.grants !== undefined && !Array.isArray(p.grants)) throw new BackupError('Damaged backup: grants');
 	if (p.savedQueries !== undefined && !Array.isArray(p.savedQueries)) throw new BackupError('Damaged backup: saved queries');
 	if (p.settings !== undefined && (typeof p.settings !== 'object' || !p.settings)) throw new BackupError('Damaged backup: settings');
+	if (p.alerts !== undefined) {
+		if (!p.alerts || typeof p.alerts !== 'object' || !Array.isArray(p.alerts.channels) || !Array.isArray(p.alerts.rules)) throw new BackupError('Damaged backup: alerts');
+		for (const c of p.alerts.channels) {
+			str(c?.id, 'alert channel id');
+			if (!(c.kind in CHANNELS)) throw new BackupError(`Damaged backup: type of alert channel ${c.name}`);
+		}
+	}
 	return { ...p, include: { connections: !!inc.connections, users: !!inc.users, settings: !!inc.settings } };
 }
 
@@ -297,6 +310,26 @@ export function previewRestore(p: BackupPayload, actorId: string | null, meta: {
 			status: same(!!s.localLoginDisabled, getKv<boolean>('local-login-disabled', false)) ? 'same' : 'update'
 		});
 	}
+	if (p.settings && p.alerts) {
+		// Secrets aren't compared (that would mean decrypting both); names, types and settings are.
+		const shape = (cs: { id: string; name: string; kind: string; enabled: boolean; config: unknown; options: unknown }[]) =>
+			cs.map((c) => JSON.stringify([c.id, c.name, c.kind, c.enabled, c.config, c.options])).sort();
+		const cur = listChannels();
+		const incoming = p.alerts.channels;
+		preview.settings.push({
+			label: 'Alert channels',
+			detail: incoming.length ? incoming.map((c) => `${c.name} (${CHANNELS[c.kind]?.label ?? c.kind})`).join(', ') : 'none',
+			status: same(shape(incoming), shape(cur)) ? 'same' : !incoming.length ? 'remove' : !cur.length ? 'new' : 'update'
+		});
+		const rshape = (rs: { id: string; kind: string; connectionId: string | null; enabled: boolean; params: unknown; notifyResolved: boolean }[]) =>
+			rs.map((r) => JSON.stringify([r.id, r.kind, r.connectionId, r.enabled, r.params, r.notifyResolved])).sort();
+		const curRules = listRules();
+		preview.settings.push({
+			label: 'Alert rules',
+			detail: plural(p.alerts.rules.length, 'rule'),
+			status: same(rshape(p.alerts.rules), rshape(curRules)) ? 'same' : !p.alerts.rules.length ? 'remove' : !curRules.length ? 'new' : 'update'
+		});
+	}
 	return preview;
 }
 
@@ -314,6 +347,8 @@ export interface RestoreResult {
 	grants: number;
 	savedQueries: { restored: number; skipped: number };
 	settings: boolean;
+	/** Alert channels and rules written (with `settings`), when the backup had them. */
+	alerts: { channels: number; rules: number; skippedRules: number } | null;
 	/** Connections whose pools should be closed. */
 	changedConnectionIds: string[];
 }
@@ -331,6 +366,7 @@ export function applyRestore(p: BackupPayload, choice: RestoreChoice, actorId: s
 		grants: 0,
 		savedQueries: { restored: 0, skipped: 0 },
 		settings: false,
+		alerts: null,
 		changedConnectionIds: []
 	};
 	const now = new Date().toISOString();
@@ -464,6 +500,7 @@ export function applyRestore(p: BackupPayload, choice: RestoreChoice, actorId: s
 			for (const [id, key] of Object.entries(s.managerKeys ?? {})) {
 				if (typeof key === 'string' && key) setKv(`${MANAGER_KEY_PREFIX}${id}`, encrypt(key, `manager:${id}`));
 			}
+			if (p.alerts) result.alerts = importAlertConfig(p.alerts);
 			result.settings = true;
 		}
 		h.exec('COMMIT');
@@ -489,5 +526,6 @@ export function summarizeResult(r: RestoreResult): string {
 	if (r.grants) parts.push(`${r.grants} grants`);
 	if (r.savedQueries.restored || r.savedQueries.skipped) parts.push(`saved queries ${r.savedQueries.restored} (skipped ${r.savedQueries.skipped})`);
 	if (r.settings) parts.push('settings replaced');
+	if (r.alerts) parts.push(`alerts: ${r.alerts.channels} channels, ${r.alerts.rules} rules${r.alerts.skippedRules ? ` (skipped ${r.alerts.skippedRules})` : ''}`);
 	return parts.join('; ') || 'nothing changed';
 }

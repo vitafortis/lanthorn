@@ -92,4 +92,15 @@ test('store export restores on a fresh install with a different master key', () 
 	assert.equal(out.sso.clientSecret, 'sso-secret-value');
 	assert.equal(out.sso.issuer, 'https://id.example');
 	assert.equal(out.localLogin, true);
+
+	// Alert channels (secrets re-sealed), rules and settings come along with the settings.
+	assert.deepEqual(
+		out.preview.settings.filter((s: { label: string }) => s.label.startsWith('Alert')).map((s: { label: string; status: string }) => `${s.label}:${s.status}`),
+		['Alert channels:update', 'Alert rules:new']
+	);
+	assert.deepEqual(out.alertChannels, [{ name: 'Phone', kind: 'telegram', config: { chatId: '42' }, minSeverity: 'critical', quiet: true, secrets: { botToken: '••••••' } }]);
+	assert.equal(out.alertSecret, '123:tg-secret');
+	assert.deepEqual(out.alertRules, ['long_query:app:{"minutes":30}', 'unreachable:all:{"failures":3}']);
+	assert.deepEqual(out.alertSettings, { intervalSeconds: 120, renotifyHours: 2, publicUrl: 'https://pgm.example' });
+	assert.deepEqual(out.result.alerts, { channels: 1, rules: 2, skippedRules: 0 });
 });

@@ -2,16 +2,29 @@
 	import { onMount } from 'svelte';
 	import { invalidateAll } from '$app/navigation';
 	import {
+		Bell,
 		BellRing,
 		CircleAlert,
 		CircleCheck,
+		Clock,
+		Gauge,
+		Hash,
 		History,
+		House,
 		ListChecks,
 		LoaderCircle,
+		Mail,
+		MessageSquare,
+		MessagesSquare,
+		Moon,
 		Pencil,
 		Plus,
 		RefreshCw,
+		Route,
+		ScrollText,
 		Send,
+		Share2,
+		Smartphone,
 		Trash2,
 		TriangleAlert,
 		Webhook
@@ -25,22 +38,27 @@
 	import {
 		CHANNEL_KINDS,
 		CHANNELS,
+		DEFAULT_CHANNEL_OPTIONS,
 		RULE_KINDS,
 		RULES,
 		defaultParams,
+		fieldVisible,
 		type ActiveAlert,
 		type AlertChannel,
+		type AlertDelivery,
 		type AlertEvent,
 		type AlertRule,
 		type AlertRuleKind,
 		type AlertSettings,
-		type ChannelKind
+		type ChannelKind,
+		type ChannelOptions,
+		type DeliveryStatus
 	} from '#lib/alerts.ts';
 
 	type JobStatus = { name: string; running: boolean; lastStartedAt: string | null; lastFinishedAt: string | null; lastError: string | null };
 	type Overview = { active: ActiveAlert[]; events: AlertEvent[]; settings: AlertSettings; jobs: JobStatus[] };
 
-	let tab = $state<'active' | 'rules' | 'channels'>('active');
+	let tab = $state<'active' | 'rules' | 'channels' | 'deliveries'>('active');
 	let overview = $state<Overview | null>(null);
 	let events = $state<AlertEvent[]>([]);
 	let moreEvents = $state(false);
@@ -172,17 +190,48 @@
 
 	// --- channels ----------------------------------------------------------------
 
-	type Form = { id: string | null; kind: ChannelKind; name: string; enabled: boolean; config: Record<string, string>; secrets: Record<string, string>; clear: string[] };
+	type Form = {
+		id: string | null;
+		kind: ChannelKind;
+		name: string;
+		enabled: boolean;
+		config: Record<string, string>;
+		options: ChannelOptions;
+		secrets: Record<string, string>;
+		clear: string[];
+	};
 	let form = $state<Form | null>(null);
+	let formTab = $state<'connection' | 'routing'>('connection');
 	let dialogOpen = $state(false);
 	let saving = $state(false);
 	let testing = $state<string | null>(null);
+	/** Last test result per channel id ('form' for the dialog), shown inline with the exact error. */
+	let testResults = $state<Record<string, { ok: boolean; error?: string; ms?: number }>>({});
 	const editing = $derived(form?.id ? channels.find((c) => c.id === form!.id) : undefined);
+
+	const KIND_ICON = {
+		slack: MessageSquare,
+		discord: MessagesSquare,
+		telegram: Send,
+		pushover: Smartphone,
+		gotify: Bell,
+		ntfy: BellRing,
+		matrix: Hash,
+		email: Mail,
+		homeassistant: House,
+		webhook: Webhook,
+		apprise: Share2
+	} satisfies Record<ChannelKind, unknown>;
+
+	const defaults = (kind: ChannelKind) => Object.fromEntries(CHANNELS[kind].fields.filter((f) => f.default).map((f) => [f.key, f.default!]));
+	const cloneOptions = (o: ChannelOptions): ChannelOptions => ({ ...o, ruleKinds: [...o.ruleKinds], connectionIds: [...o.connectionIds], quietHours: { ...o.quietHours } });
 
 	function openChannel(c?: AlertChannel) {
 		form = c
-			? { id: c.id, kind: c.kind, name: c.name, enabled: c.enabled, config: { ...c.config }, secrets: {}, clear: [] }
-			: { id: null, kind: 'ntfy', name: '', enabled: true, config: { server: 'https://ntfy.sh' }, secrets: {}, clear: [] };
+			? { id: c.id, kind: c.kind, name: c.name, enabled: c.enabled, config: { ...defaults(c.kind), ...c.config }, options: cloneOptions(c.options), secrets: {}, clear: [] }
+			: { id: null, kind: 'slack', name: '', enabled: true, config: defaults('slack'), options: cloneOptions(DEFAULT_CHANNEL_OPTIONS), secrets: {}, clear: [] };
+		formTab = 'connection';
+		delete testResults.form;
 		dialogOpen = true;
 	}
 
@@ -192,6 +241,7 @@
 		name: f.name.trim() || CHANNELS[f.kind].label,
 		enabled: f.enabled,
 		config: f.config,
+		options: f.options,
 		secrets: f.secrets,
 		clearSecrets: f.clear
 	});
@@ -218,24 +268,28 @@
 
 	async function test(body: ReturnType<typeof payload>, key: string) {
 		testing = key;
+		delete testResults[key];
 		try {
-			const r = await api.post<{ ok: boolean; error?: string }>('/api/alerts/channels/test', body);
+			const r = await api.post<{ ok: boolean; error?: string; ms?: number }>('/api/alerts/channels/test', body);
+			testResults[key] = r;
 			if (r.ok) toast('success', 'Test notification sent', 'Check that it arrived.');
 			else toast('error', 'Test failed', r.error);
 		} catch (err) {
+			testResults[key] = { ok: false, error: errorMessage(err) };
 			toast('error', 'Test failed', errorMessage(err));
 		} finally {
 			testing = null;
 		}
 	}
 
-	function testSaved(c: AlertChannel) {
-		return test({ id: c.id, kind: c.kind, name: c.name, enabled: c.enabled, config: c.config, secrets: {}, clearSecrets: [] }, c.id);
+	async function testSaved(c: AlertChannel) {
+		await test({ id: c.id, kind: c.kind, name: c.name, enabled: c.enabled, config: c.config, options: c.options, secrets: {}, clearSecrets: [] }, c.id);
+		channels = await api.get<AlertChannel[]>('/api/alerts/channels').catch(() => channels);
 	}
 
 	async function toggleChannel(c: AlertChannel, enabled: boolean) {
 		try {
-			await api.put(`/api/alerts/channels/${c.id}`, { kind: c.kind, name: c.name, enabled, config: c.config, secrets: {} });
+			await api.put(`/api/alerts/channels/${c.id}`, { kind: c.kind, name: c.name, enabled, config: c.config, options: c.options, secrets: {} });
 			channels = await api.get<AlertChannel[]>('/api/alerts/channels');
 		} catch (err) {
 			toast('error', 'Could not update channel', errorMessage(err));
@@ -253,11 +307,79 @@
 		}
 	}
 
+	function toggleIn<T>(list: T[], v: T): T[] {
+		return list.includes(v) ? list.filter((x) => x !== v) : [...list, v];
+	}
+
+	/** A short summary of a channel's routing, for its card. */
+	function routing(o: ChannelOptions): string[] {
+		const out = [o.minSeverity === 'critical' ? 'Critical only' : 'All severities'];
+		if (o.ruleKinds.length) out.push(o.ruleKinds.length === 1 ? RULES[o.ruleKinds[0]].label : `${o.ruleKinds.length} rule types`);
+		if (o.connectionIds.length) out.push(o.connectionIds.length === 1 ? connName(o.connectionIds[0]) : `${o.connectionIds.length} connections`);
+		if (!o.sendResolved) out.push('no recoveries');
+		if (!o.sendRenotify) out.push('no reminders');
+		return out;
+	}
+
+	function limits(o: ChannelOptions): string {
+		const parts = [o.maxPerHour ? `max ${o.maxPerHour}/h` : 'no rate limit', o.dedupeMinutes ? `de-dupe ${o.dedupeMinutes} min` : 'no de-dupe'];
+		return parts.join(' · ');
+	}
+
+	const serverZone = typeof Intl === 'undefined' ? '' : Intl.DateTimeFormat().resolvedOptions().timeZone;
+	const ZONES: string[] = (() => {
+		try {
+			return (Intl as unknown as { supportedValuesOf(k: string): string[] }).supportedValuesOf('timeZone');
+		} catch {
+			return [];
+		}
+	})();
+
+	// --- delivery log ------------------------------------------------------------
+
+	let deliveries = $state<AlertDelivery[]>([]);
+	let deliveriesLoaded = $state(false);
+	let moreDeliveries = $state(false);
+	let deliveryChannel = $state('');
+	const DPAGE = 50;
+
+	async function loadDeliveries(older = false) {
+		try {
+			const q = new URLSearchParams({ limit: String(DPAGE) });
+			const before = older ? deliveries.at(-1)?.id : undefined;
+			if (before) q.set('before', String(before));
+			if (deliveryChannel) q.set('channel', deliveryChannel);
+			const rows = await api.get<AlertDelivery[]>(`/api/alerts/deliveries?${q}`);
+			deliveries = older ? [...deliveries, ...rows] : rows;
+			moreDeliveries = rows.length === DPAGE;
+		} catch (err) {
+			toast('error', 'Could not load the delivery log', errorMessage(err));
+		} finally {
+			deliveriesLoaded = true;
+		}
+	}
+
+	function showLog(channelId: string) {
+		deliveryChannel = channelId;
+		tab = 'deliveries';
+	}
+
+	$effect(() => {
+		if (tab !== 'deliveries') return;
+		void deliveryChannel;
+		loadDeliveries();
+	});
+
+	const DELIVERY_BADGE: Record<DeliveryStatus, string> = { sent: 'badge-success', failed: 'badge-danger', suppressed: '', sending: 'badge-primary' };
+	const DELIVERY_LABEL: Record<DeliveryStatus, string> = { sent: 'Sent', failed: 'Failed', suppressed: 'Held back', sending: 'Sending' };
+	const DEVENT_LABEL = { fired: 'Fired', resolved: 'Resolved', renotified: 'Still firing', test: 'Test' };
+
 	const EVENT_LABEL = { fired: 'Fired', resolved: 'Resolved', renotified: 'Still firing' };
 	const TABS = [
 		{ key: 'active', label: 'Active & history', icon: History },
 		{ key: 'rules', label: 'Rules', icon: ListChecks },
-		{ key: 'channels', label: 'Channels', icon: Webhook }
+		{ key: 'channels', label: 'Channels', icon: Webhook },
+		{ key: 'deliveries', label: 'Delivery log', icon: ScrollText }
 	] as const;
 </script>
 
@@ -302,7 +424,7 @@
 					<div>
 						<p class="font-medium">No notification channel yet</p>
 						<p class="mt-0.5 text-muted-foreground">
-							Add ntfy, Gotify, Discord, a Slack-compatible or generic webhook, or Apprise under <button class="text-primary hover:underline" onclick={() => (tab = 'channels')}>Channels</button>. The first channel also turns on a sensible set of rules.
+							Add Slack, Discord, Telegram, Pushover, Gotify, ntfy, Matrix, email, Home Assistant, a webhook or Apprise under <button class="text-primary hover:underline" onclick={() => (tab = 'channels')}>Channels</button>. The first channel also turns on a sensible set of rules.
 						</p>
 					</div>
 				</div>
@@ -461,13 +583,18 @@
 				A rule for one connection replaces the all-connections rule of the same kind there; disable it to turn that check off for just that connection.
 				Checks run read-only with short timeouts, one session per database.
 			</p>
-		{:else}
-			<div class="flex justify-end"><button class="btn btn-primary" onclick={() => openChannel()}><Plus />Add channel</button></div>
+		{:else if tab === 'channels'}
+			<div class="flex flex-wrap items-center gap-3">
+				<p class="text-[11px] text-muted-foreground">Each channel decides which alerts it wants, when to stay quiet, and how often it may be notified. Secrets are stored encrypted and never shown again.</p>
+				<button class="btn btn-primary ml-auto" onclick={() => openChannel()}><Plus />Add channel</button>
+			</div>
 			<div class="grid gap-3 md:grid-cols-2 2xl:grid-cols-3">
 				{#each channels as c (c.id)}
-					<div class="card p-4">
+					{@const Icon = KIND_ICON[c.kind]}
+					{@const result = testResults[c.id]}
+					<div class="card flex flex-col p-4 {c.enabled ? '' : 'opacity-70'}">
 						<div class="flex items-start gap-3">
-							<div class="grid size-9 shrink-0 place-items-center rounded-lg bg-primary-soft text-primary"><Send class="size-4" /></div>
+							<div class="grid size-9 shrink-0 place-items-center rounded-lg bg-primary-soft text-primary"><Icon class="size-4" /></div>
 							<div class="min-w-0 flex-1">
 								<p class="truncate text-[14px] font-semibold">{c.name}</p>
 								<p class="text-xs text-muted-foreground">{CHANNELS[c.kind].label}</p>
@@ -476,79 +603,273 @@
 						</div>
 						<dl class="mt-3 space-y-1 text-[11px]">
 							{#each CHANNELS[c.kind].fields as f (f.key)}
-								{#if f.secret ? c.secrets[f.key] : c.config[f.key]}
-									<div class="flex gap-2"><dt class="w-28 shrink-0 text-muted-foreground">{f.label}</dt><dd class="truncate font-mono">{f.secret ? c.secrets[f.key] : c.config[f.key]}</dd></div>
+								{#if fieldVisible(f, c.config, c.kind) && (f.secret ? c.secrets[f.key] : c.config[f.key])}
+									<div class="flex gap-2">
+										<dt class="w-32 shrink-0 text-muted-foreground">{f.label}</dt>
+										<dd class="truncate font-mono">{f.secret ? c.secrets[f.key] : (f.options?.find((o) => o.value === c.config[f.key])?.label ?? c.config[f.key])}</dd>
+									</div>
 								{/if}
 							{/each}
 						</dl>
-						<p class="mt-3 text-[11px] {c.lastError ? 'text-danger' : 'text-muted-foreground'}">
+						<div class="mt-3 flex flex-wrap gap-1.5 text-[11px]">
+							<span class="badge"><Route class="size-3" />{routing(c.options).join(' · ')}</span>
+							{#if c.options.quietHours.enabled}
+								<span class="badge"><Moon class="size-3" />Quiet {c.options.quietHours.start}–{c.options.quietHours.end}{c.options.quietHours.allowCritical ? ', critical still sent' : ''}</span>
+							{/if}
+							<span class="badge"><Gauge class="size-3" />{limits(c.options)}</span>
+						</div>
+						<p class="mt-3 text-[11px] break-words {c.lastError ? 'text-danger' : 'text-muted-foreground'}">
 							{#if c.lastError}Last delivery failed: {c.lastError}{:else if c.lastSentAt}Last sent {ago(c.lastSentAt)}{:else}Nothing sent yet{/if}
 						</p>
-						<div class="-mx-2 mt-2 flex items-center gap-1">
+						{#if result}
+							<div
+								class="mt-2 rounded-lg border px-2.5 py-2 text-[11px] {result.ok ? 'border-success/30 bg-success/5 text-success' : 'border-danger/30 bg-danger/5 text-danger'}"
+								role="status"
+							>
+								{#if result.ok}
+									<CircleCheck class="inline size-3" /> Test delivered{result.ms != null ? ` in ${result.ms} ms` : ''}. Check that it arrived.
+								{:else}
+									<p class="flex items-center gap-1 font-medium"><CircleAlert class="size-3" />Test failed</p>
+									<p class="mt-0.5 font-mono break-words select-text">{result.error}</p>
+								{/if}
+							</div>
+						{/if}
+						<div class="-mx-2 mt-auto flex items-center gap-1 pt-2">
 							<button class="btn btn-ghost btn-sm" disabled={testing === c.id} onclick={() => testSaved(c)}>
 								{#if testing === c.id}<LoaderCircle class="animate-spin" />{:else}<Send />{/if}Send test
 							</button>
 							<button class="btn btn-ghost btn-sm" onclick={() => openChannel(c)}><Pencil />Edit</button>
+							<button class="btn btn-ghost btn-sm" onclick={() => showLog(c.id)}><ScrollText />Log</button>
 							<button class="btn btn-ghost btn-sm ml-auto hover:text-danger" onclick={() => deleteChannel(c)}><Trash2 />Delete</button>
 						</div>
 					</div>
 				{:else}
-					<div class="card col-span-full px-6 py-12 text-center text-[13px] text-muted-foreground">
-						No channels yet. Alerts are still recorded in the history; add a channel to be notified.
+					<div class="card col-span-full flex flex-col items-center gap-3 px-6 py-12 text-center text-[13px] text-muted-foreground">
+						<div class="grid size-10 place-items-center rounded-xl bg-primary-soft text-primary"><Webhook class="size-5" /></div>
+						<p>No channels yet. Alerts are still recorded in the history; add a channel to be notified.</p>
+						<button class="btn btn-primary" onclick={() => openChannel()}><Plus />Add channel</button>
 					</div>
 				{/each}
 			</div>
+		{:else}
+			<div class="flex flex-wrap items-center gap-3">
+				<select class="input h-8 w-56 text-xs" aria-label="Channel" bind:value={deliveryChannel}>
+					<option value="">All channels</option>
+					{#each channels as c (c.id)}<option value={c.id}>{c.name}</option>{/each}
+				</select>
+				<button class="btn btn-ghost btn-sm" onclick={() => loadDeliveries()}><RefreshCw />Refresh</button>
+				<p class="ml-auto text-[11px] text-muted-foreground">Every attempt to notify a channel, including tests and alerts a channel held back. The last 5,000 are kept.</p>
+			</div>
+			<div class="card overflow-x-auto">
+				<table class="w-full min-w-[720px] table-fixed text-left text-[13px]">
+					<thead class="border-b border-border bg-surface text-[11px] text-muted-foreground">
+						<tr>
+							<th class="w-32 px-4 py-2 font-medium">When</th>
+							<th class="w-44 px-4 py-2 font-medium">Channel</th>
+							<th class="w-60 px-4 py-2 font-medium">Alert</th>
+							<th class="w-28 px-4 py-2 font-medium">Result</th>
+							<th class="px-4 py-2 font-medium">Details</th>
+						</tr>
+					</thead>
+					<tbody class="divide-y divide-border">
+						{#each deliveries as d (d.id)}
+							{@const Icon = KIND_ICON[d.channelKind] ?? Send}
+							<tr class="align-top hover:bg-accent/30">
+								<td class="px-4 py-2.5 text-xs text-muted-foreground" title={new Date(d.at).toLocaleString()}>{ago(d.at)}</td>
+								<td class="px-4 py-2.5 text-xs">
+									<p class="flex items-center gap-1.5 truncate"><Icon class="size-3.5 shrink-0 text-muted-foreground" />{d.channelName}</p>
+									<p class="text-[11px] text-muted-foreground">{CHANNELS[d.channelKind]?.label ?? d.channelKind}</p>
+								</td>
+								<td class="px-4 py-2.5 text-xs">
+									<p class="truncate">
+										<span class="text-muted-foreground">{DEVENT_LABEL[d.event] ?? d.event} ·</span>
+										{d.title}
+									</p>
+									{#if d.connectionName}<p class="truncate text-[11px] text-muted-foreground">{d.connectionName}</p>{/if}
+								</td>
+								<td class="px-4 py-2.5 text-xs">
+									<span class="badge {DELIVERY_BADGE[d.status]}">{DELIVERY_LABEL[d.status]}</span>
+									{#if d.event !== 'test' && d.severity === 'critical'}<p class="mt-1 text-[11px] text-danger">critical</p>{/if}
+								</td>
+								<td class="px-4 py-2.5 text-xs break-words {d.status === 'failed' ? 'font-mono text-danger' : 'text-muted-foreground'}">
+									{d.detail ?? (d.status === 'sent' ? 'Delivered' : '—')}{#if d.durationMs != null}<span class="ml-1 font-sans text-[11px] text-muted-foreground">· {d.durationMs} ms</span>{/if}
+								</td>
+							</tr>
+						{:else}
+							<tr>
+								<td colspan="5" class="px-4 py-10 text-center text-xs text-muted-foreground">
+									{deliveriesLoaded ? 'Nothing sent yet. Use “Send test” on a channel to try it.' : 'Loading…'}
+								</td>
+							</tr>
+						{/each}
+					</tbody>
+				</table>
+			</div>
+			{#if moreDeliveries}<div class="text-center"><button class="btn btn-secondary btn-sm" onclick={() => loadDeliveries(true)}>Load older</button></div>{/if}
 		{/if}
 	</div>
 </div>
 
-<Dialog bind:open={dialogOpen} title={form?.id ? 'Edit channel' : 'Add channel'} description={form ? CHANNELS[form.kind].description : ''}>
+<Dialog bind:open={dialogOpen} width="max-w-2xl" title={form?.id ? 'Edit channel' : 'Add channel'} description={form ? CHANNELS[form.kind].description : ''}>
 	{#if form}
-		<form id="channel-form" class="space-y-3" onsubmit={saveChannel}>
-			{#if !form.id}
-				<label class="block">
-					<span class="label">Type</span>
-					<select class="input" bind:value={form.kind} onchange={() => form && (form.config = form.kind === 'ntfy' ? { server: 'https://ntfy.sh' } : {})}>
-						{#each CHANNEL_KINDS as k (k)}<option value={k}>{CHANNELS[k].label}</option>{/each}
-					</select>
-				</label>
-			{/if}
-			<label class="block">
-				<span class="label">Name</span>
-				<input class="input" placeholder={CHANNELS[form.kind].label} bind:value={form.name} />
-			</label>
-			{#each CHANNELS[form.kind].fields as f (f.key)}
-				{@const stored = editing?.secrets[f.key]}
-				<label class="block">
-					<span class="label">{f.label}{f.required ? '' : ' (optional)'}</span>
-					{#if f.secret}
-						<input
-							class="input font-mono text-xs"
-							type="password"
-							autocomplete="off"
-							placeholder={stored && !form.clear.includes(f.key) ? `Saved (${stored}) — leave blank to keep` : (f.placeholder ?? '')}
-							bind:value={form.secrets[f.key]}
-						/>
-						{#if stored && !f.required}
-							<span class="mt-1 flex items-center gap-2 text-[11px] text-muted-foreground">
-								<input
-									type="checkbox"
-									checked={form.clear.includes(f.key)}
-									onchange={(e) => form && (form.clear = e.currentTarget.checked ? [...form.clear, f.key] : form.clear.filter((k) => k !== f.key))}
-								/>Remove the saved value
-							</span>
-						{/if}
-					{:else}
-						<input class="input" placeholder={f.placeholder ?? ''} bind:value={form.config[f.key]} />
+		<form id="channel-form" class="space-y-4" onsubmit={saveChannel}>
+			<div class="inline-flex rounded-xl border border-border bg-surface p-1" role="tablist">
+				<button type="button" role="tab" aria-selected={formTab === 'connection'} class="flex h-7 items-center gap-1.5 rounded-lg px-3 text-xs {formTab === 'connection' ? 'bg-card text-foreground shadow-surface' : 'text-muted-foreground'}" onclick={() => (formTab = 'connection')}>
+					<Send class="size-3.5" />Destination
+				</button>
+				<button type="button" role="tab" aria-selected={formTab === 'routing'} class="flex h-7 items-center gap-1.5 rounded-lg px-3 text-xs {formTab === 'routing' ? 'bg-card text-foreground shadow-surface' : 'text-muted-foreground'}" onclick={() => (formTab = 'routing')}>
+					<Route class="size-3.5" />Routing & limits
+				</button>
+			</div>
+
+			{#if formTab === 'connection'}
+				<div class="grid gap-3 sm:grid-cols-2">
+					{#if !form.id}
+						<label class="block">
+							<span class="label">Type</span>
+							<select class="input" bind:value={form.kind} onchange={() => form && ((form.config = defaults(form.kind)), (form.secrets = {}), (form.clear = []))}>
+								{#each CHANNEL_KINDS as k (k)}<option value={k}>{CHANNELS[k].label}</option>{/each}
+							</select>
+						</label>
 					{/if}
-				</label>
-			{/each}
-			{#if form.kind === 'webhook'}
-				<p class="text-[11px] text-muted-foreground">
-					POSTs JSON: <code class="font-mono">{'{ source, version, event, severity, status, title, alert, message, rule, connection, value, since, at, url }'}</code> — see the README.
-				</p>
+					<label class="block {form.id ? 'sm:col-span-2' : ''}">
+						<span class="label">Name</span>
+						<input class="input" placeholder={CHANNELS[form.kind].label} bind:value={form.name} />
+					</label>
+					{#each CHANNELS[form.kind].fields as f (f.key)}
+						{#if fieldVisible(f, form.config, form.kind)}
+							{@const stored = editing?.secrets[f.key]}
+							<label class="block {f.type === 'url' || f.type === 'emails' || (f.secret && !stored) || f.key === 'room' ? 'sm:col-span-2' : ''}">
+								<span class="label">{f.label}{f.required || f.type === 'select' ? '' : ' (optional)'}</span>
+								{#if f.secret}
+									<input
+										class="input font-mono text-xs"
+										type="password"
+										autocomplete="off"
+										placeholder={stored && !form.clear.includes(f.key) ? `Saved (${stored}) — leave blank to keep` : (f.placeholder ?? '')}
+										bind:value={form.secrets[f.key]}
+									/>
+									{#if stored && !f.required}
+										<span class="mt-1 flex items-center gap-2 text-[11px] text-muted-foreground">
+											<input
+												type="checkbox"
+												checked={form.clear.includes(f.key)}
+												onchange={(e) => form && (form.clear = e.currentTarget.checked ? [...form.clear, f.key] : form.clear.filter((k) => k !== f.key))}
+											/>Remove the saved value
+										</span>
+									{/if}
+								{:else if f.type === 'select'}
+									<select class="input" bind:value={form.config[f.key]}>
+										{#each f.options ?? [] as o (o.value)}<option value={o.value}>{o.label}</option>{/each}
+									</select>
+								{:else}
+									<input
+										class="input {f.type === 'number' ? 'font-mono' : ''}"
+										inputmode={f.type === 'number' ? 'numeric' : undefined}
+										type={f.type === 'url' ? 'url' : 'text'}
+										placeholder={f.placeholder ?? ''}
+										bind:value={form.config[f.key]}
+									/>
+								{/if}
+								{#if f.help}<span class="mt-1 block text-[11px] text-muted-foreground">{f.help}</span>{/if}
+							</label>
+						{/if}
+					{/each}
+				</div>
+				{#if form.kind === 'webhook' || (form.kind === 'homeassistant' && (form.config.mode ?? 'webhook') === 'webhook')}
+					<p class="text-[11px] text-muted-foreground">
+						POSTs JSON: <code class="font-mono">{'{ source, version, event, severity, status, title, alert, message, rule, connection, value, since, at, url }'}</code> — see the README.
+					</p>
+				{/if}
+				<label class="flex items-center gap-2 text-[13px]"><Switch label="Enabled" bind:checked={form.enabled} />Enabled</label>
+			{:else}
+				{@const o = form.options}
+				<section class="space-y-3">
+					<h3 class="flex items-center gap-1.5 text-[13px] font-semibold"><Route class="size-3.5 text-muted-foreground" />Which alerts</h3>
+					<div class="grid gap-3 sm:grid-cols-2">
+						<label class="block">
+							<span class="label">Severity</span>
+							<select class="input" bind:value={o.minSeverity}>
+								<option value="warning">Warnings and critical</option>
+								<option value="critical">Critical only</option>
+							</select>
+						</label>
+						<div class="flex flex-col justify-end gap-2 pb-1 text-[13px]">
+							<label class="flex items-center gap-2"><Switch label="Send recoveries" bind:checked={o.sendResolved} />Send “resolved”</label>
+							<label class="flex items-center gap-2"><Switch label="Send reminders" bind:checked={o.sendRenotify} />Send “still firing” reminders</label>
+						</div>
+					</div>
+					<div>
+						<span class="label">Rules <span class="font-normal text-muted-foreground">— none selected: all</span></span>
+						<div class="flex flex-wrap gap-1.5">
+							{#each RULE_KINDS as k (k)}
+								{@const on = o.ruleKinds.includes(k)}
+								<button type="button" aria-pressed={on} class="badge cursor-pointer {on ? 'badge-primary' : ''}" onclick={() => (o.ruleKinds = toggleIn(o.ruleKinds, k))}>{RULES[k].label}</button>
+							{/each}
+						</div>
+					</div>
+					<div>
+						<span class="label">Connections <span class="font-normal text-muted-foreground">— none selected: all</span></span>
+						<div class="flex flex-wrap gap-1.5">
+							{#each connections.list as c (c.id)}
+								{@const on = o.connectionIds.includes(c.id)}
+								<button type="button" aria-pressed={on} class="badge cursor-pointer {on ? 'badge-primary' : ''}" onclick={() => (o.connectionIds = toggleIn(o.connectionIds, c.id))}>{c.name}</button>
+							{:else}
+								<span class="text-[11px] text-muted-foreground">No connections yet.</span>
+							{/each}
+						</div>
+					</div>
+				</section>
+
+				<section class="space-y-3 border-t border-border pt-4">
+					<div class="flex items-center gap-2">
+						<h3 class="flex items-center gap-1.5 text-[13px] font-semibold"><Moon class="size-3.5 text-muted-foreground" />Quiet hours</h3>
+						<span class="ml-auto"><Switch label="Quiet hours" bind:checked={o.quietHours.enabled} /></span>
+					</div>
+					{#if o.quietHours.enabled}
+						<div class="grid gap-3 sm:grid-cols-3">
+							<label class="block"><span class="label">From</span><input class="input font-mono" type="time" bind:value={o.quietHours.start} /></label>
+							<label class="block"><span class="label">Until</span><input class="input font-mono" type="time" bind:value={o.quietHours.end} /></label>
+							<label class="block">
+								<span class="label">Time zone</span>
+								<input class="input" list="alert-zones" placeholder="Server time{serverZone ? ` (browser: ${serverZone})` : ''}" bind:value={o.quietHours.timezone} />
+								<datalist id="alert-zones">{#each ZONES as z (z)}<option value={z}></option>{/each}</datalist>
+							</label>
+						</div>
+						<label class="flex items-center gap-2 text-[13px]"><Switch label="Still send critical" bind:checked={o.quietHours.allowCritical} />Still send critical alerts (and their recovery)</label>
+					{:else}
+						<p class="text-[11px] text-muted-foreground">Hold back notifications overnight or during work hours; they still show in the history and the delivery log.</p>
+					{/if}
+				</section>
+
+				<section class="space-y-3 border-t border-border pt-4">
+					<h3 class="flex items-center gap-1.5 text-[13px] font-semibold"><Clock class="size-3.5 text-muted-foreground" />Limits</h3>
+					<div class="grid gap-3 sm:grid-cols-2">
+						<label class="block">
+							<span class="label">At most per hour (0 = no limit)</span>
+							<input class="input font-mono" type="number" min="0" max="10000" bind:value={o.maxPerHour} />
+							<span class="mt-1 block text-[11px] text-muted-foreground">A newly firing critical alert always goes through.</span>
+						</label>
+						<label class="block">
+							<span class="label">Drop repeats within (minutes, 0 = off)</span>
+							<input class="input font-mono" type="number" min="0" max="10080" bind:value={o.dedupeMinutes} />
+							<span class="mt-1 block text-[11px] text-muted-foreground">The same alert event on the same connection, e.g. a flapping check.</span>
+						</label>
+					</div>
+				</section>
 			{/if}
-			<label class="flex items-center gap-2 text-[13px]"><Switch label="Enabled" bind:checked={form.enabled} />Enabled</label>
+
+			{#if testResults.form}
+				{@const r = testResults.form}
+				<div class="rounded-lg border px-3 py-2 text-xs {r.ok ? 'border-success/30 bg-success/5 text-success' : 'border-danger/30 bg-danger/5 text-danger'}" role="status">
+					{#if r.ok}
+						<CircleCheck class="inline size-3.5" /> Test delivered{r.ms != null ? ` in ${r.ms} ms` : ''}. Check that it arrived.
+					{:else}
+						<p class="flex items-center gap-1 font-medium"><CircleAlert class="size-3.5" />Test failed</p>
+						<p class="mt-0.5 font-mono break-words select-text">{r.error}</p>
+					{/if}
+				</div>
+			{/if}
 		</form>
 	{/if}
 	{#snippet footer()}

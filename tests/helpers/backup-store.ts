@@ -31,12 +31,24 @@ if (role === 'export') {
 	store.setManagerKey('m1', 'arc-api-key');
 	saveSso({ issuer: 'https://id.example', clientId: 'pgm', clientSecret: 'sso-secret-value', name: 'Pocket', scopes: 'openid email', autoCreate: [], adminEmails: [], defaultRole: 'viewer' });
 	store.setKv('local-login-disabled', true);
+	const alerts = await import('../../src/lib/server/alerts/store.ts');
+	const { parseChannelInput } = await import('../../src/lib/server/alerts/input.ts');
+	alerts.createChannel(
+		parseChannelInput({ kind: 'telegram', name: 'Phone', config: { chatId: '42' }, secrets: { botToken: '123:tg-secret' }, options: { minSeverity: 'critical', quietHours: { enabled: true, start: '23:00', end: '07:00' } } })
+	);
+	alerts.createRule({ kind: 'long_query', connectionId: a.id, enabled: true, params: { minutes: 30 }, notifyResolved: false });
+	alerts.createRule({ kind: 'unreachable', connectionId: null, enabled: true, params: { failures: 3 }, notifyResolved: true });
+	alerts.saveAlertSettings({ intervalSeconds: 120, renotifyHours: 2, publicUrl: 'https://pgm.example' });
 	const envelope = await encodeBackup(cb.snapshot({ connections: true, users: true, settings: true }), PASSPHRASE, FAST);
 	writeFileSync(file, JSON.stringify(envelope));
 	console.log(JSON.stringify({ ok: true }));
 } else {
 	// A fresh install whose signed-in admin is admin@x.io with a different password.
 	const me = store.createUser({ email: 'admin@x.io', role: 'admin', passwordHash: hashPassword('new-password') });
+	const alerts = await import('../../src/lib/server/alerts/store.ts');
+	const { parseChannelInput } = await import('../../src/lib/server/alerts/input.ts');
+	// A channel only on this install: the restore replaces the alert setup as a whole.
+	alerts.createChannel(parseChannelInput({ kind: 'webhook', name: 'Local only', secrets: { url: 'https://hook.example/x' } }));
 	const { payload } = await decodeBackup(readFileSync(file, 'utf8'), PASSPHRASE);
 	const p = cb.validatePayload(payload);
 	const preview = cb.previewRestore(p, me.id, { createdAt: '', appVersion: '' });
@@ -70,7 +82,11 @@ if (role === 'export') {
 			settings: store.getSettings(),
 			managerKey: store.getManagerKey('m1'),
 			sso: ssoConfig(),
-			localLogin: store.getKv('local-login-disabled', null)
+			localLogin: store.getKv('local-login-disabled', null),
+			alertChannels: alerts.listChannels().map((c) => ({ name: c.name, kind: c.kind, config: c.config, minSeverity: c.options.minSeverity, quiet: c.options.quietHours.enabled, secrets: c.secrets })),
+			alertSecret: alerts.channelWithSecrets(alerts.listChannels()[0]?.id ?? '')?.secrets.botToken ?? null,
+			alertRules: alerts.listRules().map((r) => `${r.kind}:${r.connectionId ? conns.find((c) => c.id === r.connectionId)?.name : 'all'}:${JSON.stringify(r.params)}`).sort(),
+			alertSettings: alerts.alertSettings()
 		})
 	);
 }

@@ -769,7 +769,30 @@ function migrateAlerts(h: DatabaseSync) {
 			error TEXT
 		);
 		CREATE INDEX IF NOT EXISTS alert_events_time ON alert_events(id DESC);
+
+		-- Every attempt to notify a channel, including ones the channel's policy held back.
+		-- Names are copied so entries outlive channels; \`dedupe_key\` drives de-duplication.
+		CREATE TABLE IF NOT EXISTS alert_deliveries (
+			id INTEGER PRIMARY KEY AUTOINCREMENT,
+			at INTEGER NOT NULL,
+			channel_id TEXT,
+			channel_name TEXT NOT NULL,
+			channel_kind TEXT NOT NULL,
+			event_id INTEGER,
+			event TEXT NOT NULL,
+			severity TEXT NOT NULL,
+			title TEXT NOT NULL,
+			connection_name TEXT,
+			dedupe_key TEXT,
+			status TEXT NOT NULL,
+			detail TEXT,
+			duration_ms INTEGER
+		);
+		CREATE INDEX IF NOT EXISTS alert_deliveries_channel ON alert_deliveries(channel_id, at);
 	`);
+	// Routing, quiet hours and limits per channel (JSON; missing keys take the defaults).
+	const cols = h.prepare(`SELECT name FROM pragma_table_info('alert_channels')`).all() as { name: string }[];
+	if (!cols.some((c) => c.name === 'options')) h.exec(`ALTER TABLE alert_channels ADD COLUMN options TEXT NOT NULL DEFAULT '{}'`);
 }
 
 function migrateSizeHistory(h: DatabaseSync) {
